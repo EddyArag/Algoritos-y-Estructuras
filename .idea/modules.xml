@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SESION2/Codigos/ACTIVIDADES/ACTIVIDADES.iml" filepath="$PROJECT_DIR$/SESION2/Codigos/ACTIVIDADES/ACTIVIDADES.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Algoritos-y-Estructuras.iml" filepath="$PROJECT_DIR$/.idea/Algoritos-y-Estructuras.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SESION2/Codigos/Ejercicios/src/Ej3/Ej3.iml" filepath="$PROJECT_DIR$/SESION2/Codigos/Ejercicios/src/Ej3/Ej3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SESION2/Codigos/Ejercicios/src/Ejercicios.iml" filepath="$PROJECT_DIR$/SESION2/Codigos/Ejercicios/src/Ejercicios.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SESION2/Codigos/Ejercicios/Ejercicios2.iml" filepath="$PROJECT_DIR$/SESION2/Codigos/Ejercicios/Ejercicios2.iml" />
+    </modules>
+  </component>
+</project>
