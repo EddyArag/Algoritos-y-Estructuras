@@ -1,17 +1,28 @@
 package EjerciciosFinal;
 
 public class Principal {
-    public static void main(String[] args) {
-        Bolsa<Chocolatina> bolsaCho = new Bolsa<Chocolatina>(8);
-        Chocolatina c = new Chocolatina("milka");
-        Chocolatina c1 = new Chocolatina("milka");
-        Chocolatina c2 = new Chocolatina("ferrero");
-        bolsaCho.add(c);
-        bolsaCho.add(c1);
-        bolsaCho.add(c2);
-        for (Chocolatina chocolatina : bolsaCho) {
-            System.out.println(chocolatina.getMarca());
+    // Método genérico para imprimir el contenido de una Bolsa
+    public static <T> void imprimirBolsa(Bolsa<T> bolsa) {
+        for (T item : bolsa) {
+            System.out.println(item.toString());
         }
+    }
 
+    public static void main(String[] args) {
+        Bolsa<Chocolatina> bolsaCho = new Bolsa<>(3);
+        bolsaCho.add(new Chocolatina("Milka"));
+        bolsaCho.add(new Chocolatina("Ferrero"));
+        bolsaCho.add(new Chocolatina("KitKat"));
+
+        System.out.println("Contenido de la bolsa de Chocolatinas:");
+        imprimirBolsa(bolsaCho);
+
+        Bolsa<Golosina> bolsaGolosinas = new Bolsa<>(3);
+        bolsaGolosinas.add(new Golosina("Caramelo", 10.5));
+        bolsaGolosinas.add(new Golosina("Gomita", 8.2));
+        bolsaGolosinas.add(new Golosina("Chicle", 5.0));
+
+        System.out.println("\nContenido de la bolsa de Golosinas:");
+        imprimirBolsa(bolsaGolosinas);
     }
 }
