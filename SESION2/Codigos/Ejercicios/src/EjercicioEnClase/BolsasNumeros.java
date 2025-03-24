@@ -3,7 +3,7 @@ package EjercicioEnClase;
 import java.util.ArrayList;
 import java.util.List;
 
-class BolsasNumeros<N extends Number & Comparable<N>> {
+class BolsasNumeros<N extends Number & Comparable<N>> extends Bolsa<N> {
     private List<N> numeros;
 
     public BolsasNumeros() {

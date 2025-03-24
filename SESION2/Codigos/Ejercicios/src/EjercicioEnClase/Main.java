@@ -18,12 +18,16 @@ public class Main {
         bolsita3.agregarNumero(2);
         bolsita3.agregarNumero(10);
         bolsita3.agregarNumero(5);
-
-        List<BolsasNumeros<?>> listaBolsas = new ArrayList<>();
+        sBolsa<String> bolsaTexto = new sBolsa<>();
+        bolsaTexto.agregarElemento("Alex");
+        bolsaTexto.agregarElemento("Orlando");
+        bolsaTexto.agregarElemento("Alvarito");
+        List<Bolsa<?>> listaBolsas = new ArrayList<>();
         listaBolsas.add(bolsita1);
         listaBolsas.add(bolsita2);
         listaBolsas.add(bolsita3);
-        for (BolsasNumeros<?> bolsa : listaBolsas) {
+        listaBolsas.add(bolsaTexto);
+        for (Bolsa<?> bolsa : listaBolsas) {
             System.out.println(bolsa);
         }
 
