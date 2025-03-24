@@ -12,5 +12,6 @@ public class Principal {
         for (Chocolatina chocolatina : bolsaCho) {
             System.out.println(chocolatina.getMarca());
         }
+
     }
 }
