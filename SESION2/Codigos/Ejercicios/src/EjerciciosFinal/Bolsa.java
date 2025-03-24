@@ -19,29 +19,9 @@ public class Bolsa<T> implements Iterable<T> {
             throw new RuntimeException("No caben más objetos en la bolsa");
         }
     }
+
     @Override
     public Iterator<T> iterator() {
         return lista.iterator();
-    }
-}
-
-class Chocolatina {
-    private String marca;
-
-    public Chocolatina(String marca) {
-        this.marca = marca;
-    }
-
-    public String getMarca() {
-        return marca;
-    }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
-    }
-
-    @Override
-    public String toString() {
-        return "Chocolatina: " + marca;
     }
 }
