@@ -19,7 +19,7 @@ public class Bolsa<T> implements Iterable<T> {
             throw new RuntimeException("No caben más objetos en la bolsa");
         }
     }
-
+    @Override 
     public Iterator<T> iterator() {
         return lista.iterator();
     }
