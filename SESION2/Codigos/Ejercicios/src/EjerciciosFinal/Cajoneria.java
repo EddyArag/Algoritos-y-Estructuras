@@ -19,7 +19,8 @@ class Cajoneria implements Iterable<Caja<?>> {
         }
     }
 
-    // search busca un objeto en la cajoneria y devuelve su posición y color de la caja
+    // search busca un objeto en la cajoneria y devuelve su posición y color de la
+    // caja
     public String search(Object objeto) {
         for (int i = 0; i < lista.size(); i++) {
             Caja<?> caja = lista.get(i);
