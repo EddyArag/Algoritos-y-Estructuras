@@ -142,7 +142,7 @@ class ListaEnlazada<T extends Comparable<T>> {
     public boolean contiene(T dato) {
         Nodo<T> actual = primero; // Empezamos desde el primer nodo
         while (actual != null) { // Mientras haya nodos
-            if (actual.dato.equals(dato)) { // Si encontramos el dato
+            if (actual.dato.compareTo(dato) == 0) { // Si encontramos el dato
                 return true;
             }
             actual = actual.enlace; // Avanzamos al siguiente nodo
