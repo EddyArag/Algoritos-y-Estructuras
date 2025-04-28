@@ -174,7 +174,8 @@ class ListaEnlazada<T extends Comparable<T>> {
      * 
      * @return Dato más prioritario o null si la lista está vacía
      */
-    @SuppressWarnings("unchecked")
+/*    
+@SuppressWarnings("unchecked")
     public T obtenerMasPrioritario() {
         if (primero == null) // Si la lista está vacía, no hay prioridad
             return null;
