@@ -21,7 +21,7 @@ public class Nodo<T> {
  * Clase ListaEnlazada personalizada
  * Implementa una lista enlazada simple con varias operaciones
  */
-class ListaEnlazada<T> {
+class ListaEnlazada<T extends Comparable<T>> {
     private Nodo<T> primero; // Referencia al primer nodo de la lista
 
     /**
@@ -61,18 +61,49 @@ class ListaEnlazada<T> {
      * 
      * @param dato Dato a insertar
      */
-    public void insertarAlFinal(T dato) {
-        Nodo<T> nuevoNodo = new Nodo<>(dato); // Creamos un nuevo nodo con el dato dado
+    public void insertaLastOrdenada(T dato) {
+        Nodo<T> nuevoNodo = new Nodo<>(dato); // Creamos un nuevo nodo que contiene el dato que queremos insertar
+
         if (primero == null) { // Si la lista está vacía
-            primero = nuevoNodo; // El nuevo nodo se convierte en el primero
+            primero = nuevoNodo; // El nuevo nodo se convierte en el primer nodo de la lista
         } else {
-            Nodo<T> actual = primero; // Nodo actual para recorrer desde el principio
-            while (actual.enlace != null) { // Mientras haya un siguiente nodo
-                actual = actual.enlace; // Avanzamos al siguiente
+            Nodo<T> actual = primero; // Creamos un nodo auxiliar para recorrer la lista desde el inicio
+
+            if (dato.compareTo(primero.dato) < 0) { // Si el nuevo dato es menor que el primer dato
+                nuevoNodo.enlace = primero; // El nuevo nodo apunta al nodo que antes era el primero
+                primero = nuevoNodo; // Ahora el nuevo nodo es el primer nodo de la lista
+                return; // Terminamos porque ya insertamos
             }
-            actual.enlace = nuevoNodo; // Enlazamos el último nodo al nuevo nodo
+
+            actual = primero; // Inicializamos 'actual' para recorrer desde el primer nodo
+
+            // Avanzamos mientras no lleguemos al final de la lista y el dato a insertar sea
+            // mayor que el dato siguiente
+            while (actual.enlace != null && dato.compareTo(actual.enlace.dato) > 0) {
+                actual = actual.enlace; // Avanzamos al siguiente nodo
+            }
+
+            // Insertamos el nuevo nodo entre 'actual' y 'actual.enlace'
+            nuevoNodo.enlace = actual.enlace; // El nuevo nodo apunta al siguiente de 'actual'
+            actual.enlace = nuevoNodo; // 'actual' ahora apunta al nuevo nodo
         }
     }
+
+    /*
+     * public void insertarAlFinal(T dato) {
+     * Nodo<T> nuevoNodo = new Nodo<>(dato); // Creamos un nuevo nodo con el dato
+     * dado
+     * if (primero == null) { // Si la lista está vacía
+     * primero = nuevoNodo; // El nuevo nodo se convierte en el primero
+     * } else {
+     * Nodo<T> actual = primero; // Nodo actual para recorrer desde el principio
+     * while (actual.enlace != null) { // Mientras haya un siguiente nodo
+     * actual = actual.enlace; // Avanzamos al siguiente
+     * }
+     * actual.enlace = nuevoNodo; // Enlazamos el último nodo al nuevo nodo
+     * }
+     * }
+     */
 
     /**
      * Elimina un nodo que contenga el dato especificado

@@ -78,7 +78,7 @@ public class Tarea implements Comparable<Tarea> {
  * Administra tareas pendientes y tareas completadas usando una lista enlazada y
  * un ArrayList
  */
-class GestorDeTareas<T> {
+class GestorDeTareas<T extends Comparable<T>> {
     private ListaEnlazada<T> tareasPendientes; // Lista enlazada de tareas pendientes
     private List<T> tareasCompletadas; // Lista de tareas que ya se completaron (ArrayList)
 
@@ -97,7 +97,7 @@ class GestorDeTareas<T> {
      * @param tarea Tarea a agregar
      */
     public void agregarTarea(T tarea) {
-        tareasPendientes.insertarAlFinal(tarea); // Insertamos la tarea al final de la lista
+        tareasPendientes.insertaLastOrdenada(tarea); // Insertamos la tarea al final de la lista
     }
 
     /**
