@@ -1,4 +1,4 @@
-package SESION06.Actividad;
+package SESION06.ActividadPila;
 
 public interface Stack<E>{
     public void push(E x);

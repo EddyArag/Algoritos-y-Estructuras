@@ -1,6 +1,6 @@
-package SESION05.Actividad;
+package SESION06.ActividadPila;
 
-public class StackArray<E> implements Stack<E> {
+public class StackArray<E> implements Stack<E>{
     private E[] array;
     private int tope;
 
@@ -8,15 +8,15 @@ public class StackArray<E> implements Stack<E> {
         this.array = (E[]) new Object[n];
         this.tope = -1;
     }
-
+    @Override
     public void push(E x){
         if(this.isFull()){
-            throw new ExceptionIsEmpty("Pila llena");
+            System.out.println("Pila llena");
         } else{
-            tope++;
-            array[tope] = x;
+            array[++tope] = x;
         }
     }
+    @Override
     public E pop() throws ExceptionIsEmpty{
         if(this.isEmpty()){
             throw new ExceptionIsEmpty("Pila vacía");
@@ -27,6 +27,7 @@ public class StackArray<E> implements Stack<E> {
             return elemento;
         }
     }
+    @Override
     public E top() throws ExceptionIsEmpty{
         if(this.isEmpty()){
             throw new ExceptionIsEmpty("Pila vacía");
@@ -34,6 +35,7 @@ public class StackArray<E> implements Stack<E> {
             return array[tope];
         }
     }
+    @Override
     public boolean isEmpty(){
         return tope == -1;
     }
