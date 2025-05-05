@@ -1,0 +1,76 @@
+package SESION06.ActividadColaPrioritaria;
+
+public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements PriorityQueue<E, N> {
+    class EntryNode {
+        E dato;
+        N prioridad;
+
+        public EntryNode(E dato, N prioridad) {
+            this.dato = dato;
+            this.prioridad = prioridad;
+        }
+
+        public int compareTo(N pr) {
+            return this.prioridad.compareTo(pr);
+        }
+    }
+    private Node<EntryNode> first;
+    private Node<EntryNode> last;
+
+    public PriorityQueueLinkSort() {
+        this.first = null;
+        this.last = null;
+    }
+    
+    public void enqueue(E x, N pr) {
+        Node<EntryNode> nuevoNodo = new Node<>(new EntryNode(x, pr));
+        if(isEmpty()) {
+            first = nuevoNodo;
+        } else {
+            if(last.getElemento().prioridad.compareTo(pr) == -1) {
+                last.setNext(nuevoNodo);
+                last = nuevoNodo;
+            }
+        }
+        this.last = nuevoNodo;
+    }
+    public E dequeue() throws ExceptionIsEmpty {
+        if(this.isEmpty()) {
+            throw new ExceptionIsEmpty("La cola está vacía.");
+        }
+        E aux = this.first.getElemento().dato;
+        this.first = this.first.getNext();
+        if(this.first == null) {
+            this.last = null;
+        }
+        return aux;
+    }
+    public E back() throws ExceptionIsEmpty {
+        if(this.isEmpty()) {
+            throw new ExceptionIsEmpty("La cola está vacía.");
+        }
+        return this.last.getElemento().dato;
+    }
+    public E front() throws ExceptionIsEmpty {
+        if(this.isEmpty()) {
+            throw new ExceptionIsEmpty("La cola está vacía.");
+        }
+        return this.first.getElemento().dato;
+    }
+    public boolean isEmpty() {
+        if(this.first == null) {
+            return true;
+        }
+        return false;
+    }
+
+    public String toString() {
+        String cad = "";
+        Node<EntryNode> actual = this.first;
+        while(actual != null) {
+            cad += actual.getElemento().dato + " ";
+            actual = actual.getNext();
+        }
+        return cad;
+    }
+}
