@@ -1,11 +1,10 @@
-package SESION06.ejercicio1;
+package ejercicio1;
 
-import SESION06.ejercicio1.StackLink;
-import SESION06.ActividadPila.Stack;
-import SESION06.ActividadPila.ExceptionIsEmpty;
+import ActividadPila.Stack;
+import ActividadPila.ExceptionIsEmpty;
 
 public class Test {
-    public static void main(String[]    args) {
+    public static void main(String[] args) {
         // Crear una pila de enteros
         Stack<Integer> integerStack = new StackLink<>();
 

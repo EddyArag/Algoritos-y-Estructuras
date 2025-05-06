@@ -1,11 +1,11 @@
-package SESION06.ejercicio1;
+package ejercicio1;
 
-import SESION06.ActividadPila.ExceptionIsEmpty;
-import SESION06.ActividadPila.Stack;
+import ActividadPila.ExceptionIsEmpty;
+import ActividadPila.Stack;
 
 public class StackLink<E> implements Stack<E> {
     private Node<E> top; // Nodo superior de la pila
-    private int size;     // Tamaño de la pila
+    private int size; // Tamaño de la pila
 
     public StackLink() {
         this.top = null;

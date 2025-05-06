@@ -1,4 +1,4 @@
-package SESION06.ejercicio1;
+package ejercicio1;
 
 public class Node<E> {
     private E data;

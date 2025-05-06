@@ -1,19 +1,25 @@
 package ejercicio3;
 
-import ActividadColaPrioritaria.PriorityQueue;
 import ActividadCola.QueueLink;
-import ActividadColaPrioritaria.ExceptionIsEmpty;
+import ActividadColaPrioritaria.PriorityQueue;
 
-public class PriorityQueueLinked<E> implements PriorityQueue<E, Integer> {
-    private QueueLink<E>[] queues; // Arreglo de colas (una por prioridad)
-    private int maxPriorities; // Niveles de prioridad (0 = máxima prioridad)
+public class PriorityQueueLinked<E extends Comparable<E>> implements PriorityQueue<E, Integer> {
+    private QueueLink<E>[] queues;
+    private int maxPriorities;
+
+    // Excepción personalizada para cola vacía
+    public static class PriorityQueueEmptyException extends RuntimeException {
+        public PriorityQueueEmptyException(String message) {
+            super(message);
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public PriorityQueueLinked(int maxPriorities) {
         this.maxPriorities = maxPriorities;
         this.queues = new QueueLink[maxPriorities];
         for (int i = 0; i < maxPriorities; i++) {
-            queues[i] = new QueueLink<>(); // Inicializa cada cola
+            queues[i] = new QueueLink<>();
         }
     }
 
@@ -22,44 +28,56 @@ public class PriorityQueueLinked<E> implements PriorityQueue<E, Integer> {
         if (priority < 0 || priority >= maxPriorities) {
             throw new IllegalArgumentException("Prioridad inválida. Debe estar entre 0 y " + (maxPriorities - 1));
         }
-        queues[priority].enqueue(x); // Añade a la cola correspondiente
+        queues[priority].enqueue(x);
     }
 
     @Override
-    public E dequeue() throws ExceptionIsEmpty {
-        for (int i = 0; i < maxPriorities; i++) { // Busca desde la mayor prioridad (0)
-            if (!queues[i].isEmpty()) {
-                return queues[i].dequeue(); // Extrae el primero de la cola no vacía
-            }
-        }
-        throw new ExceptionIsEmpty("La cola de prioridad está vacía");
-    }
-
-    @Override
-    public E front() throws ExceptionIsEmpty {
+    public E dequeue() {
         for (int i = 0; i < maxPriorities; i++) {
             if (!queues[i].isEmpty()) {
-                return queues[i].front(); // Primer elemento de la cola no vacía
+                try {
+                    return queues[i].dequeue();
+                } catch (ActividadCola.ExceptionIsEmpty e) {
+                    throw new PriorityQueueEmptyException("Error interno inesperado: cola vacía detectada");
+                }
             }
         }
-        throw new ExceptionIsEmpty("La cola de prioridad está vacía");
+        throw new PriorityQueueEmptyException("La cola de prioridad está vacía");
     }
 
     @Override
-    public E back() throws ExceptionIsEmpty {
-        for (int i = maxPriorities - 1; i >= 0; i--) { // Busca desde la menor prioridad
+    public E front() {
+        for (int i = 0; i < maxPriorities; i++) {
             if (!queues[i].isEmpty()) {
-                return queues[i].back(); // Último elemento de la cola no vacía
+                try {
+                    return queues[i].front();
+                } catch (ActividadCola.ExceptionIsEmpty e) {
+                    throw new PriorityQueueEmptyException("Error interno inesperado: cola vacía detectada");
+                }
             }
         }
-        throw new ExceptionIsEmpty("La cola de prioridad está vacía");
+        throw new PriorityQueueEmptyException("La cola de prioridad está vacía");
+    }
+
+    @Override
+    public E back() {
+        for (int i = maxPriorities - 1; i >= 0; i--) {
+            if (!queues[i].isEmpty()) {
+                try {
+                    return queues[i].back();
+                } catch (ActividadCola.ExceptionIsEmpty e) {
+                    throw new PriorityQueueEmptyException("Error interno inesperado: cola vacía detectada");
+                }
+            }
+        }
+        throw new PriorityQueueEmptyException("La cola de prioridad está vacía");
     }
 
     @Override
     public boolean isEmpty() {
         for (int i = 0; i < maxPriorities; i++) {
             if (!queues[i].isEmpty()) {
-                return false; // Si alguna cola no está vacía, retorna false
+                return false;
             }
         }
         return true;
