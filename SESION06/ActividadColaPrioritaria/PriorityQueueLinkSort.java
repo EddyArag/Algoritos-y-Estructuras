@@ -25,26 +25,36 @@ public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements Priori
 
     public void enqueue(E x, N pr) {
         Node<EntryNode> nuevoNodo = new Node<>(new EntryNode(x, pr));
+
+        // Caso: la cola está vacía
         if (isEmpty()) {
-            this.first = nuevoNodo;
-            this.last = nuevoNodo;
+            this.first = this.last = nuevoNodo;
+            return;
         }
-        if (this.first.getElemento().prioridad.compareTo(pr) == -1) {
+
+        // Caso: el nuevo nodo tiene mayor prioridad que el primero (va al frente)
+        if (pr.compareTo(this.first.getElemento().prioridad) < 0) {
             nuevoNodo.setNext(this.first);
             this.first = nuevoNodo;
+            return;
         }
-        if (this.last.getElemento().prioridad.compareTo(pr) == -1) {
-            this.last.setNext(nuevoNodo);
+
+        // Recorremos para encontrar el lugar adecuado
+        Node<EntryNode> actual = this.first;
+        Node<EntryNode> anterior = null;
+
+        while (actual != null && pr.compareTo(actual.getElemento().prioridad) >= 0) {
+            anterior = actual;
+            actual = actual.getNext();
+        }
+
+        // Insertar en el medio o al final
+        nuevoNodo.setNext(actual);
+        anterior.setNext(nuevoNodo);
+
+        // Si se insertó al final, actualizar el puntero 'last'
+        if (nuevoNodo.getNext() == null) {
             this.last = nuevoNodo;
-        } else {
-            Node<EntryNode> actual = this.first;
-            while (actual.getNext() != null) {
-                if (actual.getElemento().prioridad.compareTo(pr) >= 0) {
-                    nuevoNodo.setNext(actual.getNext());
-                    actual.setNext(nuevoNodo);
-                }
-                actual = actual.getNext();
-            }
         }
     }
 
