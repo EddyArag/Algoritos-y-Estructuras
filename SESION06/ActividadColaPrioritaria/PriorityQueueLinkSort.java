@@ -1,4 +1,4 @@
-package SESION06.ActividadColaPrioritaria;
+package ActividadColaPrioritaria;
 
 public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements PriorityQueue<E, N> {
     class EntryNode {
@@ -14,6 +14,7 @@ public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements Priori
             return this.prioridad.compareTo(pr);
         }
     }
+
     private Node<EntryNode> first;
     private Node<EntryNode> last;
 
@@ -21,24 +22,24 @@ public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements Priori
         this.first = null;
         this.last = null;
     }
-    
+
     public void enqueue(E x, N pr) {
         Node<EntryNode> nuevoNodo = new Node<>(new EntryNode(x, pr));
-        if(isEmpty()) {
+        if (isEmpty()) {
             this.first = nuevoNodo;
             this.last = nuevoNodo;
-        } 
-        if(this.first.getElemento().prioridad.compareTo(pr) == -1) {
+        }
+        if (this.first.getElemento().prioridad.compareTo(pr) == -1) {
             nuevoNodo.setNext(this.first);
             this.first = nuevoNodo;
-        } 
-        if(this.last.getElemento().prioridad.compareTo(pr) == -1) {
+        }
+        if (this.last.getElemento().prioridad.compareTo(pr) == -1) {
             this.last.setNext(nuevoNodo);
             this.last = nuevoNodo;
         } else {
             Node<EntryNode> actual = this.first;
-            while(actual.getNext() != null) {
-                if(actual.getElemento().prioridad.compareTo(pr) >= 0) {
+            while (actual.getNext() != null) {
+                if (actual.getElemento().prioridad.compareTo(pr) >= 0) {
                     nuevoNodo.setNext(actual.getNext());
                     actual.setNext(nuevoNodo);
                 }
@@ -46,31 +47,35 @@ public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements Priori
             }
         }
     }
+
     public E dequeue() throws ExceptionIsEmpty {
-        if(this.isEmpty()) {
+        if (this.isEmpty()) {
             throw new ExceptionIsEmpty("La cola está vacía.");
         }
         E aux = this.first.getElemento().dato;
         this.first = this.first.getNext();
-        if(this.first == null) {
+        if (this.first == null) {
             this.last = null;
         }
         return aux;
     }
+
     public E back() throws ExceptionIsEmpty {
-        if(this.isEmpty()) {
+        if (this.isEmpty()) {
             throw new ExceptionIsEmpty("La cola está vacía.");
         }
         return this.last.getElemento().dato;
     }
+
     public E front() throws ExceptionIsEmpty {
-        if(this.isEmpty()) {
+        if (this.isEmpty()) {
             throw new ExceptionIsEmpty("La cola está vacía.");
         }
         return this.first.getElemento().dato;
     }
+
     public boolean isEmpty() {
-        if(this.first == null) {
+        if (this.first == null) {
             return true;
         }
         return false;
@@ -79,7 +84,7 @@ public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements Priori
     public String toString() {
         String cad = "";
         Node<EntryNode> actual = this.first;
-        while(actual != null) {
+        while (actual != null) {
             cad += actual.getElemento().dato + " ";
             actual = actual.getNext();
         }

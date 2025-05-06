@@ -1,6 +1,7 @@
-import ejercicio2.QueueArray;
-import SESION06.ActividadCola.Queue;
-import SESION06.ActividadCola.ExceptionIsEmpty;
+package ejercicio2;
+
+import ActividadCola.Queue;
+import ActividadCola.ExceptionIsEmpty;
 
 public class Test {
     public static void main(String[] args) {

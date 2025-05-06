@@ -1,13 +1,13 @@
 package ejercicio2;
 
-import SESION06.ActividadCola.ExceptionIsEmpty;
-import SESION06.ActividadCola.Queue;
+import ActividadCola.ExceptionIsEmpty;
+import ActividadCola.Queue;
 
 public class QueueArray<E> implements Queue<E> {
     private E[] array;
-    private int first;  // Índice del primer elemento
-    private int last;   // Índice del último elemento
-    private int size;   // Número actual de elementos
+    private int first; // Índice del primer elemento
+    private int last; // Índice del último elemento
+    private int size; // Número actual de elementos
     private final int capacity; // Capacidad máxima del arreglo
 
     @SuppressWarnings("unchecked")

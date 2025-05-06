@@ -1,17 +1,17 @@
 package ejercicio2;
 
-import SESION06.ActividadCola.Queue;
-import SESION06.ActividadCola.ExceptionIsEmpty;
+import ActividadCola.Queue;
+import ActividadCola.ExceptionIsEmpty;
 
 public class QueueArrayEddy<E> implements Queue<E> {
     private E[] array;
-    private int first;  // Índice del primer elemento
-    private int last;   // Índice del último elemento
-    private int size;   // Número de elementos actuales
+    private int first; // Índice del primer elemento
+    private int last; // Índice del último elemento
+    private int size; // Número de elementos actuales
     private int capacity; // Tamaño máximo del arreglo
 
     @SuppressWarnings("unchecked")
-    public QueueArray(int capacity) {
+    public QueueArrayEddy(int capacity) {
         this.capacity = capacity;
         this.array = (E[]) new Object[capacity];
         this.first = 0;
@@ -63,12 +63,14 @@ public class QueueArrayEddy<E> implements Queue<E> {
 
     @Override
     public String toString() {
-        if (isEmpty()) return "[]";
+        if (isEmpty())
+            return "[]";
         StringBuilder sb = new StringBuilder("[");
         int current = first;
         for (int i = 0; i < size; i++) {
             sb.append(array[current]);
-            if (i < size - 1) sb.append(", ");
+            if (i < size - 1)
+                sb.append(", ");
             current = (current + 1) % capacity;
         }
         sb.append("]");

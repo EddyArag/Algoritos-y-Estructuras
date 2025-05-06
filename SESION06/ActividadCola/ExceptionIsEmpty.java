@@ -1,7 +1,7 @@
-package SESION06.ActividadCola;
+package ActividadCola;
 
 public class ExceptionIsEmpty extends Exception {
-    public ExceptionIsEmpty(String mensaje){
+    public ExceptionIsEmpty(String mensaje) {
         super(mensaje);
     }
 }
