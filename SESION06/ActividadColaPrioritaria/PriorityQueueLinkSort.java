@@ -25,14 +25,26 @@ public class PriorityQueueLinkSort<E, N extends Comparable<N>> implements Priori
     public void enqueue(E x, N pr) {
         Node<EntryNode> nuevoNodo = new Node<>(new EntryNode(x, pr));
         if(isEmpty()) {
-            first = nuevoNodo;
+            this.first = nuevoNodo;
+            this.last = nuevoNodo;
+        } 
+        if(this.first.getElemento().prioridad.compareTo(pr) == -1) {
+            nuevoNodo.setNext(this.first);
+            this.first = nuevoNodo;
+        } 
+        if(this.last.getElemento().prioridad.compareTo(pr) == -1) {
+            this.last.setNext(nuevoNodo);
+            this.last = nuevoNodo;
         } else {
-            if(last.getElemento().prioridad.compareTo(pr) == -1) {
-                last.setNext(nuevoNodo);
-                last = nuevoNodo;
+            Node<EntryNode> actual = this.first;
+            while(actual.getNext() != null) {
+                if(actual.getElemento().prioridad.compareTo(pr) >= 0) {
+                    nuevoNodo.setNext(actual.getNext());
+                    actual.setNext(nuevoNodo);
+                }
+                actual = actual.getNext();
             }
         }
-        this.last = nuevoNodo;
     }
     public E dequeue() throws ExceptionIsEmpty {
         if(this.isEmpty()) {
