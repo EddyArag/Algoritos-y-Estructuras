@@ -1,5 +1,8 @@
 package SESION07.Ejercicio01;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 class ArbolEjercicio1<E extends Comparable<E>> {
     private Nodoejer1<E> root;
 
@@ -46,36 +49,55 @@ class ArbolEjercicio1<E extends Comparable<E>> {
 
     private int countNodes(Nodoejer1<E> node) {
         if (node == null) return 0;
-        return 1 + countNodes(node.getLeft()) + countNodes(node.getRight());
+        int count = 0;
+        if (node.getLeft() != null || node.getRight() != null) {
+            count = 1; // Nodo no-hoja
+        }
+        return count + countNodes(node.getLeft()) + countNodes(node.getRight());
     }
 
+    // Metodo height(x) iterativo (altura del subárbol cuya raíz tiene dato x)
     public int height(E x) {
         Nodoejer1<E> subtreeRoot = search(this.root, x);
         if (subtreeRoot == null) return -1;
-        return height(subtreeRoot);
-    }
 
-    private int height(Nodoejer1<E> node) {
-        if (node == null) return -1; // Altura de un nodo nulo es -1
-        return 1 + Math.max(height(node.getLeft()), height(node.getRight()));
-    }
+        Queue<Nodoejer1<E>> queue = new LinkedList<>();
+        queue.add(subtreeRoot);
+        int height = -1;
 
-    public int amplitude() {
-        if (isEmpty()) return 0;
-        int maxWidth = 0;
-        int height = height(root.getElem());
-
-        for (int level = 0; level <= height; level++) {
-            int width = getWidth(root, level);
-            if (width > maxWidth) maxWidth = width;
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            height++;
+            for (int i = 0; i < levelSize; i++) {
+                Nodoejer1<E> current = queue.poll();
+                if (current.getLeft() != null) queue.add(current.getLeft());
+                if (current.getRight() != null) queue.add(current.getRight());
+            }
         }
-        return maxWidth;
+        return height;
     }
 
-    private int getWidth(Nodoejer1<E> node, int level) {
-        if (node == null) return 0;
-        if (level == 0) return 1;
-        return getWidth(node.getLeft(), level - 1) + getWidth(node.getRight(), level - 1);
+    // Metodo amplitude(Nivel) que retorna la amplitud en ese nivel
+    public int amplitude(int nivel) {
+        if (isEmpty()) return 0;
+
+        Queue<Nodoejer1<E>> queue = new LinkedList<>();
+        queue.add(root);
+        int currentLevel = 0;
+
+        while (!queue.isEmpty()) {
+            if (currentLevel == nivel) {
+                return queue.size(); // cantidad nodos en nivel dado
+            }
+            int levelSize = queue.size();
+            for (int i = 0; i < levelSize; i++) {
+                Nodoejer1<E> current = queue.poll();
+                if (current.getLeft() != null) queue.add(current.getLeft());
+                if (current.getRight() != null) queue.add(current.getRight());
+            }
+            currentLevel++;
+        }
+        return 0; // nivel no existe
     }
 
     public void insert(E x) throws ExceptionDuplicateejer1 {
@@ -109,3 +131,26 @@ class ArbolEjercicio1<E extends Comparable<E>> {
         }
     }
 }
+
+/**
+Metodo height(x) iterativo (altura del subárbol cuya raíz tiene dato x)
+    public int height(E x) {
+        Nodoejer1<E> subtreeRoot = search(this.root, x);
+        if (subtreeRoot == null) return -1;
+
+        Queue<Nodoejer1<E>> queue = new LinkedList<>();
+        queue.add(subtreeRoot);
+        int height = -1;
+
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();
+            height++;
+            for (int i = 0; i < levelSize; i++) {
+                Nodoejer1<E> current = queue.poll();
+                if (current.getLeft() != null) queue.add(current.getLeft());
+                if (current.getRight() != null) queue.add(current.getRight());
+            }
+        }
+        return height;
+    }
+    **/
