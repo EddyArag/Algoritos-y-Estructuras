@@ -84,40 +84,47 @@ public class LinkedBST<E extends Comparable<E>> implements BinarySearchTree<E> {
         }
     }
 
-    @Override
-    public void delete(E data) throws ExceptionIsEmpty {
-        if (isEmpty()) {
-            throw new ExceptionIsEmpty("The tree is empty.");
-        }
-        root = deleteRec(root, data);
+@Override
+public void delete(E data) throws ExceptionIsEmpty {
+    // Verifica si el árbol está vacío
+    if (isEmpty()) {
+        throw new ExceptionIsEmpty("El árbol está vacío.");
     }
+    // Llama al método recursivo para eliminar el nodo
+    root = deleteRec(root, data);
+}
 
-    private Node deleteRec(Node node, E data) {
-        if (node == null) {
-            return node;
-        }
-
-        int cmp = data.compareTo(node.data);
-        if (cmp < 0) {
-            node.left = deleteRec(node.left, data);
-        } else if (cmp > 0) {
-            node.right = deleteRec(node.right, data);
-        } else {
-            // Node with only one child or no child
-            if (node.left == null) {
-                return node.right;
-            } else if (node.right == null) {
-                return node.left;
-            }
-
-            // Node with two children: Get the inorder successor (smallest in the right subtree)
-            node.data = minValue(node.right);
-
-            // Delete the inorder successor
-            node.right = deleteRec(node.right, node.data);
-        }
+private Node deleteRec(Node node, E data) {
+    // Si el nodo es nulo, simplemente retorna nulo
+    if (node == null) {
         return node;
     }
+
+    // Compara el dato a eliminar con el dato del nodo actual
+    int cmp = data.compareTo(node.data);
+    if (cmp < 0) {
+        // Si el dato es menor, busca en el subárbol izquierdo
+        node.left = deleteRec(node.left, data);
+    } else if (cmp > 0) {
+        // Si el dato es mayor, busca en el subárbol derecho
+        node.right = deleteRec(node.right, data);
+    } else {
+        // Nodo con un solo hijo o sin hijos
+        if (node.left == null) {
+            return node.right; // Retorna el hijo derecho
+        } else if (node.right == null) {
+            return node.left; // Retorna el hijo izquierdo
+        }
+
+        // Nodo con dos hijos: Obtiene el sucesor en orden (el más pequeño en el subárbol derecho)
+        node.data = minValue(node.right);
+
+        // Elimina el sucesor en orden
+        node.right = deleteRec(node.right, node.data);
+    }
+    return node; // Retorna el nodo actualizado
+}
+
 
     private E minValue(Node node) {
         E minv = node.data;
