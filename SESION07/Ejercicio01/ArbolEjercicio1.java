@@ -132,25 +132,3 @@ class ArbolEjercicio1<E extends Comparable<E>> {
     }
 }
 
-/**
-Metodo height(x) iterativo (altura del subárbol cuya raíz tiene dato x)
-    public int height(E x) {
-        Nodoejer1<E> subtreeRoot = search(this.root, x);
-        if (subtreeRoot == null) return -1;
-
-        Queue<Nodoejer1<E>> queue = new LinkedList<>();
-        queue.add(subtreeRoot);
-        int height = -1;
-
-        while (!queue.isEmpty()) {
-            int levelSize = queue.size();
-            height++;
-            for (int i = 0; i < levelSize; i++) {
-                Nodoejer1<E> current = queue.poll();
-                if (current.getLeft() != null) queue.add(current.getLeft());
-                if (current.getRight() != null) queue.add(current.getRight());
-            }
-        }
-        return height;
-    }
-    **/
