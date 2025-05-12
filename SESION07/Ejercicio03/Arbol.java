@@ -180,12 +180,13 @@ public class Arbol<E extends Comparable<E>> {
         // Verifica si el nodo tiene hijos
         if (node.getLeft() != null || node.getRight() != null) {
             System.out.println(" (");
-            // Llamadas recursivas para los hijos
-            if (node.getLeft() != null)
+            // Llamadas recursivas para los hijos, respetando la jerarquía
+            if (node.getLeft() != null) {
                 parenthesizeR(node.getLeft(), nivel + 1);
-            if (node.getRight() != null)
+            }
+            if (node.getRight() != null) {
                 parenthesizeR(node.getRight(), nivel + 1);
-
+            }
             // Cierra el paréntesis con sangría
             for (int i = 0; i < nivel; i++) {
                 System.out.print("    ");

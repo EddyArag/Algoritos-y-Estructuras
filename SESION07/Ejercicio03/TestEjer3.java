@@ -6,17 +6,16 @@ public class TestEjer3 {
 
         try {
             // Inserción ordenada para formar un BST equilibrado
-            arbol.insert("M"); // raíz
-            arbol.insert("F"); // izquierda
-            arbol.insert("T"); // derecha
-            arbol.insert("C");
-            arbol.insert("H");
-            arbol.insert("R");
-            arbol.insert("Z");
-            arbol.insert("A");
-            arbol.insert("D");
-            arbol.insert("G");
-            arbol.insert("I");
+            arbol.insert("Sales");
+            arbol.insert("Domestic");
+            arbol.insert("International");
+            arbol.insert("Canada");
+            arbol.insert("S. America");
+            arbol.insert("Overseas");
+            arbol.insert("Africa");
+            arbol.insert("Asia");
+            arbol.insert("Australia");
+            arbol.insert("Europe");
 
             System.out.println("Representación con sangría del árbol BST:");
             arbol.parenthesize();
