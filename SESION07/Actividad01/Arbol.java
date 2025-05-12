@@ -99,9 +99,9 @@ public class Arbol<E extends Comparable<E>> {
         if(actual == null) {
             return "";
         } else {
-            return inOrder(actual.getLeft()) 
+            return inOrder(actual.getLeft()).toString() 
                     + actual.toString() 
-                    + inOrder(actual.getRight());
+                    + inOrder(actual.getRight()).toString();
         }
     }
     public String preOrder() {
@@ -112,8 +112,8 @@ public class Arbol<E extends Comparable<E>> {
             return "";
         } else {
             return actual.toString() 
-                    + preOrder(actual.getLeft()) 
-                    + preOrder(actual.getRight());
+                    + preOrder(actual.getLeft()).toString() 
+                    + preOrder(actual.getRight()).toString();
         }
     }
     public String postOrder() {
@@ -123,8 +123,8 @@ public class Arbol<E extends Comparable<E>> {
         if(actual == null) {
             return "";
         } else {
-            return postOrder(actual.getLeft())
-                    + postOrder(actual.getRight())
+            return postOrder(actual.getLeft()).toString()
+                    + postOrder(actual.getRight()).toString()
                     + actual.toString(); 
         }    
     }
