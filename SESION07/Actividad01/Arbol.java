@@ -26,7 +26,7 @@ public class Arbol<E extends Comparable<E>> {
                 actual.setLeft(insert(actual.getLeft(), x));
             }
             if(comp == -1) {
-                actual.setRight(insert(actual.getRigth(), x));
+                actual.setRight(insert(actual.getRight(), x));
             } else {
                 throw new ExceptionDuplicate("No se aceptan valores duplicados.");
             }
@@ -45,13 +45,13 @@ public class Arbol<E extends Comparable<E>> {
                 actual.setLeft(remove(actual.getLeft(), x));
             }
             if(comp == -1) {
-                actual.setRight(remove(actual.getRigth(), x));
+                actual.setRight(remove(actual.getRight(), x));
             }
             if(comp == 0) {
                 if(actual.getLeft() == null) {
-                    return actual.getRigth();
+                    return actual.getRight();
                 } else {
-                    if(actual.getRigth() == null) {
+                    if(actual.getRight() == null) {
                         return actual.getLeft();
                     } else {
                         Node<E> antecesor = maxOfMinRemove(actual.getLeft());
@@ -64,10 +64,10 @@ public class Arbol<E extends Comparable<E>> {
         return actual;
     }
     public Node<E> maxOfMinRemove(Node<E> otherRoot) {
-        if(otherRoot.getRigth() == null) {
+        if(otherRoot.getRight() == null) {
             return otherRoot;
         } else {
-            return maxOfMinRemove(otherRoot.getRigth());
+            return maxOfMinRemove(otherRoot.getRight());
         }
     }
     public boolean search(E x) {
@@ -85,10 +85,66 @@ public class Arbol<E extends Comparable<E>> {
                 return search(actual.getLeft(), x);
             }
             if(comp == -1) {
-                return search(actual.getRigth(), x);
+                return search(actual.getRight(), x);
             } else {
                 return actual;
             }
         }
+    }
+
+    public String inOrder() {
+        return inOrder(this.root);
+    }
+    public String inOrder(Node<E> actual) {
+        if(actual == null) {
+            return "";
+        } else {
+            return inOrder(actual.getLeft()) 
+                    + actual.toString() 
+                    + inOrder(actual.getRight());
+        }
+    }
+    public String preOrder() {
+        return preOrder(this.root);
+    }
+    public String preOrder(Node<E> actual) {
+        if(actual == null) {
+            return "";
+        } else {
+            return actual.toString() 
+                    + preOrder(actual.getLeft()) 
+                    + preOrder(actual.getRight());
+        }
+    }
+    public String postOrder() {
+        return postOrder(this.root);
+    }
+    public String postOrder(Node<E> actual) {
+        if(actual == null) {
+            return "";
+        } else {
+            return postOrder(actual.getLeft())
+                    + postOrder(actual.getRight())
+                    + actual.toString(); 
+        }    
+    }
+
+    public E minSearch() {
+        return minSearch(this.root).getElem();
+    }
+    public Node<E> minSearch(Node<E> actual) {
+        if(actual.getLeft() != null) {
+             return minSearch(actual.getLeft());
+        }
+        return actual;
+    }
+    public E maxSearch() {
+        return maxSearch(this.root).getElem();
+    }
+    public Node<E> maxSearch(Node<E> actual) {
+        if(actual.getRight() != null) {
+             return maxSearch(actual.getRight());
+        }
+        return actual;
     }
 }
