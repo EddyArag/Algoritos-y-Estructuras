@@ -10,22 +10,24 @@ public class Arbol<E extends Comparable<E>> {
     public boolean isEmpty() {
         return root == null;
     }
+
     public void destroy() {
         root = null;
     }
+
     public void insert(E x) throws ExceptionDuplicate {
         this.root = insert(this.root, x);
     }
-    public Node<E> insert(Node<E> actual, E x) throws ExceptionDuplicate{
+
+    public Node<E> insert(Node<E> actual, E x) throws ExceptionDuplicate {
         Node<E> anterior = actual;
-        if(root == null) {
+        if (actual == null) {
             return new Node<E>(x);
         } else {
             int comp = actual.getElem().compareTo(x);
-            if(comp == 1) {
+            if (comp > 0) {
                 actual.setLeft(insert(actual.getLeft(), x));
-            }
-            if(comp == -1) {
+            } else if (comp < 0) {
                 actual.setRight(insert(actual.getRight(), x));
             } else {
                 throw new ExceptionDuplicate("No se aceptan valores duplicados.");
@@ -33,58 +35,59 @@ public class Arbol<E extends Comparable<E>> {
         }
         return anterior;
     }
-    public E remove(E x) throws ExceptionDuplicate{
+
+    public E remove(E x) throws ExceptionDuplicate {
         return (remove(this.root, x)).getElem();
     }
-    public Node<E> remove(Node<E> actual, E x) throws ExceptionDuplicate{
-        if(actual == null) {
+
+    public Node<E> remove(Node<E> actual, E x) throws ExceptionDuplicate {
+        if (actual == null) {
             throw new ExceptionDuplicate("No se encontró el elemento.");
         } else {
             int comp = actual.getElem().compareTo(x);
-            if(comp == 1) {
+            if (comp > 0) {
                 actual.setLeft(remove(actual.getLeft(), x));
-            }
-            if(comp == -1) {
+            } else if (comp < 0) {
                 actual.setRight(remove(actual.getRight(), x));
-            }
-            if(comp == 0) {
-                if(actual.getLeft() == null) {
+            } else {
+                if (actual.getLeft() == null) {
                     return actual.getRight();
+                } else if (actual.getRight() == null) {
+                    return actual.getLeft();
                 } else {
-                    if(actual.getRight() == null) {
-                        return actual.getLeft();
-                    } else {
-                        Node<E> antecesor = maxOfMinRemove(actual.getLeft());
-                        actual.setElem(antecesor.getElem());
-                        actual.setLeft(antecesor);
-                    }
+                    actual.setElem(minSearch(actual.getRight()).getElem());
+                    actual.setRight(minOfMaxRemove(actual.getRight()));
                 }
             }
         }
         return actual;
     }
-    public Node<E> maxOfMinRemove(Node<E> otherRoot) {
-        if(otherRoot.getRight() == null) {
-            return otherRoot;
+
+    public Node<E> minOfMaxRemove(Node<E> otherRoot) {
+        if (otherRoot.getLeft() != null) {
+            otherRoot.setLeft(minOfMaxRemove(otherRoot.getLeft()));
         } else {
-            return maxOfMinRemove(otherRoot.getRight());
+            otherRoot = otherRoot.getRight();
         }
+        return otherRoot;
     }
+
     public boolean search(E x) {
-        if (search(this.root, x) == null){
+        if (search(this.root, x) == null) {
             return false;
         }
         return true;
     }
+
     public Node<E> search(Node<E> actual, E x) {
-        if(actual == null) {
+        if (actual == null) {
             return null;
         } else {
             int comp = actual.getElem().compareTo(x);
-            if(comp == 1) {
+            if (comp == 1) {
                 return search(actual.getLeft(), x);
             }
-            if(comp == -1) {
+            if (comp == -1) {
                 return search(actual.getRight(), x);
             } else {
                 return actual;
@@ -95,55 +98,63 @@ public class Arbol<E extends Comparable<E>> {
     public String inOrder() {
         return inOrder(this.root);
     }
+
     public String inOrder(Node<E> actual) {
-        if(actual == null) {
+        if (actual == null) {
             return "";
         } else {
-            return inOrder(actual.getLeft()).toString() 
-                    + actual.toString() 
+            return inOrder(actual.getLeft()).toString()
+                    + actual.toString()
                     + inOrder(actual.getRight()).toString();
         }
     }
+
     public String preOrder() {
         return preOrder(this.root);
     }
+
     public String preOrder(Node<E> actual) {
-        if(actual == null) {
+        if (actual == null) {
             return "";
         } else {
-            return actual.toString() 
-                    + preOrder(actual.getLeft()).toString() 
+            return actual.toString()
+                    + preOrder(actual.getLeft()).toString()
                     + preOrder(actual.getRight()).toString();
         }
     }
+
     public String postOrder() {
         return postOrder(this.root);
     }
+
     public String postOrder(Node<E> actual) {
-        if(actual == null) {
+        if (actual == null) {
             return "";
         } else {
             return postOrder(actual.getLeft()).toString()
                     + postOrder(actual.getRight()).toString()
-                    + actual.toString(); 
-        }    
+                    + actual.toString();
+        }
     }
 
     public E minSearch() {
         return minSearch(this.root).getElem();
     }
+
     public Node<E> minSearch(Node<E> actual) {
-        if(actual.getLeft() != null) {
-             return minSearch(actual.getLeft());
+        if (actual.getLeft() != null) {
+            return minSearch(actual.getLeft());
         }
         return actual;
     }
+
     public E maxSearch() {
         return maxSearch(this.root).getElem();
     }
+
     public Node<E> maxSearch(Node<E> actual) {
-        if(actual.getRight() != null) {
-             return maxSearch(actual.getRight());
+        if (actual.getRight() != null) {
+            return maxSearch(actual.getRight());
         }
         return actual;
     }
