@@ -1,128 +1,92 @@
 package SESION07.Ejercicio02;
 
-import java.util.Queue;
-import java.util.LinkedList;
+import SESION07.Ejercicio01.QueueLink;
+import SESION07.Ejercicio01.ExceptionIsEmpty;
 
 public class ArbolEjercicio2<E extends Comparable<E>> {
     private Nodoejer2<E> root;
 
-    public ArbolEjercicio2() {
-        this.root = null;
-    }
+    // [Métodos anteriores iguales...]
 
-    public boolean isEmpty() {
-        return root == null;
-    }
-
-    public void destroy() {
-        root = null;
-    }
-
-    public void destroyNodes() throws ExceptionIsEmptyejer2 {
-        if (isEmpty()) {
-            throw new ExceptionIsEmptyejer2("El árbol ya está vacío");
-        }
-        destroyNodes(this.root);
-        this.root = null;
-    }
-
-    private void destroyNodes(Nodoejer2<E> node) {
-        if (node == null) return;
-        destroyNodes(node.getLeft());
-        destroyNodes(node.getRight());
-        node.setLeft(null);
-        node.setRight(null);
-    }
-
-    public int countAllNodes() {
-        return countAllNodes(this.root);
-    }
-
-    private int countAllNodes(Nodoejer2<E> node) {
-        if (node == null) return 0;
-        return 1 + countAllNodes(node.getLeft()) + countAllNodes(node.getRight());
-    }
-
-    // Método para insertar un elemento en el BST
-    public void insert(E x) throws ExceptionDuplicateejer2 {
-        this.root = insert(this.root, x);
-    }
-
-    private Nodoejer2<E> insert(Nodoejer2<E> actual, E x) throws ExceptionDuplicateejer2 {
-        if (actual == null) {
-            return new Nodoejer2<E>(x);
-        }
-        int comp = actual.getElem().compareTo(x);
-        if (comp > 0) {
-            actual.setLeft(insert(actual.getLeft(), x));
-        } else if (comp < 0) {
-            actual.setRight(insert(actual.getRight(), x));
-        } else {
-            throw new ExceptionDuplicateejer2("No se aceptan valores duplicados.");
-        }
-        return actual;
-    }
-
-    private Nodoejer2<E> search(Nodoejer2<E> node, E x) {
-        if (node == null || node.getElem().equals(x)) {
-            return node;
-        }
-        int comp = node.getElem().compareTo(x);
-        if (comp > 0) {
-            return search(node.getLeft(), x);
-        } else {
-            return search(node.getRight(), x);
-        }
-    }
-
-    // Método iterativo para calcular área: hojas * altura
-    public int areaBST() {
-        if (isEmpty()) return 0;
-
-        Queue<Nodoejer2<E>> queue = new LinkedList<>();
-        queue.offer(root);
-        int leafCount = 0;
-        int height = -1;
-
-        while (!queue.isEmpty()) {
-            int levelSize = queue.size();
-            height++;
-
-            for (int i = 0; i < levelSize; i++) {
-                Nodoejer2<E> current = queue.poll();
-                if (current.getLeft() == null && current.getRight() == null) {
-                    leafCount++;
-                }
-                if (current.getLeft() != null) queue.offer(current.getLeft());
-                if (current.getRight() != null) queue.offer(current.getRight());
-            }
-        }
-        return leafCount * height;
-    }
-
-    // Método para dibujar el árbol por niveles mostrando nodos y relaciones
     public void drawBST() {
         if (isEmpty()) {
             System.out.println("El árbol está vacío.");
             return;
         }
 
-        Queue<Nodoejer2<E>> queue = new LinkedList<>();
-        queue.offer(root);
-        int level = 0;
+        int height = getHeight(root);
+        int width = (int) Math.pow(2, height) * 4;
+
+        QueueLink<PrintableNode<E>> queue = new QueueLink<>();
+        queue.enqueue(new PrintableNode<>(root, width/2, width, 0));
+
+        int currentLevel = 0;
+        StringBuilder nodeLine = new StringBuilder();
+        StringBuilder connectionLine = new StringBuilder();
 
         while (!queue.isEmpty()) {
-            int levelSize = queue.size();
-            System.out.print("Nivel " + level + ": ");
+            try {
+                PrintableNode<E> printable = queue.dequeue();
+                Nodoejer2<E> node = printable.node;
+                int pos = printable.pos;
+                int space = printable.space;
+                int level = printable.level;
 
-            for (int i = 0; i < levelSize; i++) {
-                Nodoejer2<E> current = queue.poll();
-                System.out.print(current.getElem() + " ");
-                if (current.getLeft() != null) queue.offer(current.getLeft());
-                if (current.getRight() != null) queue.offer(current.getRight());
+                if (level != currentLevel) {
+                    System.out.println(nodeLine.toString());
+                    System.out.println(connectionLine.toString());
+                    nodeLine = new StringBuilder();
+                    connectionLine = new StringBuilder();
+                    currentLevel = level;
+                }
+
+                // Centrar el nodo
+                for (int i = nodeLine.length(); i < pos; i++) {
+                    nodeLine.append(" ");
+                }
+                nodeLine.append(node.getElem());
+
+                // Conexiones
+                if (node.getLeft() != null) {
+                    int leftPos = pos - space/4;
+                    for (int i = connectionLine.length(); i < leftPos; i++) {
+                        connectionLine.append(" ");
+                    }
+                    connectionLine.append("/");
+                    queue.enqueue(new PrintableNode<>(node.getLeft(), leftPos, space/2, level+1));
+                }
+
+                if (node.getRight() != null) {
+                    int rightPos = pos + space/4;
+                    for (int i = connectionLine.length(); i < rightPos; i++) {
+                        connectionLine.append(" ");
+                    }
+                    connectionLine.append("\\");
+                    queue.enqueue(new PrintableNode<>(node.getRight(), rightPos, space/2, level+1));
+                }
+            } catch (ExceptionIsEmpty e) {
+                e.printStackTrace();
             }
-            System.out.println();
-            level++;
+        }
+        System.out.println(nodeLine.toString());
+    }
+
+    private int getHeight(Nodoejer2<E> node) {
+        if (node == null) return 0;
+        return 1 + Math.max(getHeight(node.getLeft()), getHeight(node.getRight()));
+    }
+
+    private static class PrintableNode<E> {
+        Nodoejer2<E> node;
+        int pos;
+        int space;
+        int level;
+
+        PrintableNode(Nodoejer2<E> node, int pos, int space, int level) {
+            this.node = node;
+            this.pos = pos;
+            this.space = space;
+            this.level = level;
         }
     }
 }
