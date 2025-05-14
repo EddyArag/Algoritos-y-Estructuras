@@ -1,7 +1,7 @@
 package SESION07.Actividad01;
 
 public class Arbol<E extends Comparable<E>> {
-    private Node<E> root;
+    protected Node<E> root;
 
     public Arbol() {
         this.root = null;

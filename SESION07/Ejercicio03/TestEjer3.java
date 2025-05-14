@@ -1,8 +1,10 @@
 package SESION07.Ejercicio03;
 
+import SESION07.Actividad01.ExceptionDuplicate;
+
 public class TestEjer3 {
     public static void main(String[] args) {
-        Arbol<String> arbol = new Arbol<>();
+        ArbolEjer3<String> arbol = new ArbolEjer3<>();
 
         try {
             // Inserción ordenada para formar un BST equilibrado
