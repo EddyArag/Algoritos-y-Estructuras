@@ -1,6 +1,6 @@
 package SESION07.Ejercicio02;
 
-public class TesterEjer2.java {
+public class TesterEjer2 {
     public static void main(String[] args) {
         try {
             ArbolEjercicio2<Integer> arbol = new ArbolEjercicio2<>();

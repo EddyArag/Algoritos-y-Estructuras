@@ -20,9 +20,9 @@ public class QueueLink<E> {
         size++;
     }
 
-    public E dequeue() throws ExceptionEmptyEjercicio2 {
+    public E dequeue() throws ExceptionIsEmptyejer2 {
         if (isEmpty())
-            throw new ExceptionEmptyEjercicio2("Cola vacía");
+            throw new ExceptionIsEmptyejer2("Cola vacía");
         E temp = front.elem;
         front = front.next;
         if (front == null)
