@@ -1,7 +1,7 @@
 package SESION07.Ejercicio01;
 
 public class ArbolEjercicio1<E extends Comparable<E>> {
-    private Nodoejer1<E> root;
+    protected Nodoejer1<E> root;
 
     public ArbolEjercicio1() {
         this.root = null;
@@ -17,7 +17,8 @@ public class ArbolEjercicio1<E extends Comparable<E>> {
     }
 
     private void destroyNodesRec(Nodoejer1<E> node) {
-        if (node == null) return;
+        if (node == null)
+            return;
         destroyNodesRec(node.getLeft());
         destroyNodesRec(node.getRight());
         node.setLeft(null);
@@ -30,7 +31,8 @@ public class ArbolEjercicio1<E extends Comparable<E>> {
     }
 
     private int countAllNodesRec(Nodoejer1<E> node) {
-        if (node == null) return 0;
+        if (node == null)
+            return 0;
         return 1 + countAllNodesRec(node.getLeft()) + countAllNodesRec(node.getRight());
     }
 
@@ -47,32 +49,37 @@ public class ArbolEjercicio1<E extends Comparable<E>> {
     }
 
     // d. Altura del subárbol con raíz 'x' (iterativo)
-    public int height(E x) {
+    public int height(E x) throws ExceptionIsEmptyejer1 {
         Nodoejer1<E> subtreeRoot = search(root, x);
-        if (subtreeRoot == null) return -1;
+        if (subtreeRoot == null)
+            return -1;
 
-        QueueLink<Nodoejer1<E>> queue = new QueueLink<>();
-        queue.enqueue(subtreeRoot);
+        QueueLink<E> queue = new QueueLink<>();
+        queue.enqueue(subtreeRoot.getElem());
         int height = -1;
 
         while (!queue.isEmpty()) {
             int levelSize = queueSize(queue);
             height++;
             for (int i = 0; i < levelSize; i++) {
-                Nodoejer1<E> current = queue.dequeue();
-                if (current.getLeft() != null) queue.enqueue(current.getLeft());
-                if (current.getRight() != null) queue.enqueue(current.getRight());
+                E currentElem = queue.dequeue();
+                Nodoejer1<E> current = search(root, currentElem);
+                if (current.getLeft() != null)
+                    queue.enqueue(current.getLeft().getElem());
+                if (current.getRight() != null)
+                    queue.enqueue(current.getRight().getElem());
             }
         }
         return height;
     }
 
     // e. Amplitud en un nivel específico
-    public int amplitude(int nivel) {
-        if (root == null) return 0;
+    public int amplitude(int nivel) throws ExceptionIsEmptyejer1 {
+        if (root == null)
+            return 0;
 
-        QueueLink<Nodoejer1<E>> queue = new QueueLink<>();
-        queue.enqueue(root);
+        QueueLink<E> queue = new QueueLink<>();
+        queue.enqueue(root.getElem());
         int currentLevel = 0;
 
         while (!queue.isEmpty()) {
@@ -81,9 +88,12 @@ public class ArbolEjercicio1<E extends Comparable<E>> {
             }
             int levelSize = queueSize(queue);
             for (int i = 0; i < levelSize; i++) {
-                Nodoejer1<E> current = queue.dequeue();
-                if (current.getLeft() != null) queue.enqueue(current.getLeft());
-                if (current.getRight() != null) queue.enqueue(current.getRight());
+                E currentElem = queue.dequeue();
+                Nodoejer1<E> current = search(root, currentElem);
+                if (current.getLeft() != null)
+                    queue.enqueue(current.getLeft().getElem());
+                if (current.getRight() != null)
+                    queue.enqueue(current.getRight().getElem());
             }
             currentLevel++;
         }
@@ -100,15 +110,23 @@ public class ArbolEjercicio1<E extends Comparable<E>> {
                 : search(node.getRight(), x);
     }
 
-    private int queueSize(QueueLink<Nodoejer1<E>> queue) {
+    private int queueSize(QueueLink<E> queue) {
         int size = 0;
-        QueueLink<Nodoejer1<E>> temp = new QueueLink<>();
+        QueueLink<E> temp = new QueueLink<>();
         while (!queue.isEmpty()) {
-            temp.enqueue(queue.dequeue());
-            size++;
+            try {
+                temp.enqueue(queue.dequeue());
+                size++;
+            } catch (ExceptionIsEmptyejer1 e) {
+                // Manejar excepción si es necesario
+            }
         }
         while (!temp.isEmpty()) {
-            queue.enqueue(temp.dequeue());
+            try {
+                queue.enqueue(temp.dequeue());
+            } catch (ExceptionIsEmptyejer1 e) {
+                // Manejar excepción si es necesario
+            }
         }
         return size;
     }
@@ -119,11 +137,15 @@ public class ArbolEjercicio1<E extends Comparable<E>> {
     }
 
     private Nodoejer1<E> insertRec(Nodoejer1<E> node, E x) throws ExceptionDuplicateejer1 {
-        if (node == null) return new Nodoejer1<>(x);
+        if (node == null)
+            return new Nodoejer1<>(x);
         int cmp = x.compareTo(node.getElem());
-        if (cmp < 0) node.setLeft(insertRec(node.getLeft(), x));
-        else if (cmp > 0) node.setRight(insertRec(node.getRight(), x));
-        else throw new ExceptionDuplicateejer1("Elemento duplicado: " + x);
+        if (cmp < 0)
+            node.setLeft(insertRec(node.getLeft(), x));
+        else if (cmp > 0)
+            node.setRight(insertRec(node.getRight(), x));
+        else
+            throw new ExceptionDuplicateejer1("Elemento duplicado: " + x);
         return node;
     }
 }
