@@ -25,7 +25,7 @@ public class ArbolAVL<E extends Comparable<E>> extends Arbol<E> {
         }
     }
 
-    private boolean height;
+    protected boolean height;
 
     public ArbolAVL() {
         super();
@@ -214,4 +214,70 @@ public class ArbolAVL<E extends Comparable<E>> extends Arbol<E> {
         }
     }
 
+    private int getTreeHeight(Node<E> node) {
+        if (node == null)
+            return 0;
+        int leftHeight = getTreeHeight(node.getLeft());
+        int rightHeight = getTreeHeight(node.getRight());
+        return 1 + Math.max(leftHeight, rightHeight);
+    }
+
+    public void drawAVL() throws ExceptionIsEmptyejer2 {
+        if (this.root == null) {
+            System.out.println("Árbol AVL vacío");
+            return;
+        }
+
+        int height = getTreeHeight(this.root);
+        QueueLink<Node<E>> queue = new QueueLink<>();
+        queue.enqueue(this.root);
+
+        for (int level = 1; level <= height; level++) {
+            int nodesInLevel = (int) Math.pow(2, level - 1);
+            int spacesBefore = (int) Math.pow(2, height - level) - 1;
+            int spacesBetween = (int) Math.pow(2, height - level + 1) - 1;
+
+            // Asegurar espacios no negativos
+            spacesBefore = Math.max(0, spacesBefore);
+            spacesBetween = Math.max(0, spacesBetween);
+
+            StringBuilder nodeLine = new StringBuilder();
+            StringBuilder branchLine = new StringBuilder();
+            Node<E>[] currentNodes = new Node[nodesInLevel];
+
+            for (int i = 0; i < nodesInLevel; i++) {
+                Node<E> node = queue.dequeue();
+                currentNodes[i] = node;
+
+                nodeLine.append(" ".repeat(spacesBefore));
+                if (node != null) {
+                    nodeLine.append(String.format("%2s", node.getElem()));
+                    queue.enqueue(node.getLeft());
+                    queue.enqueue(node.getRight());
+                } else {
+                    nodeLine.append("  ");
+                    queue.enqueue(null);
+                    queue.enqueue(null);
+                }
+                nodeLine.append(" ".repeat(spacesBetween));
+            }
+            System.out.println(nodeLine.toString());
+
+            if (level < height) {
+                for (int i = 0; i < nodesInLevel; i++) {
+                    Node<E> node = currentNodes[i];
+                    branchLine.append(" ".repeat(spacesBefore > 0 ? spacesBefore - 1 : 0));
+                    if (node != null) {
+                        branchLine.append(node.getLeft() != null ? "/" : " ");
+                        branchLine.append(" ".repeat(spacesBetween));
+                        branchLine.append(node.getRight() != null ? "\\" : " ");
+                    } else {
+                        branchLine.append("   ").append(" ".repeat(spacesBetween)).append(" ");
+                    }
+                    branchLine.append(" ".repeat(spacesBefore > 0 ? spacesBefore - 1 : 0));
+                }
+                System.out.println(branchLine.toString());
+            }
+        }
+    }
 }

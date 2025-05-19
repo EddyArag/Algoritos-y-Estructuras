@@ -1,72 +1,114 @@
 package SESION08;
 
-import SESION07.Actividad01.Node;
-import SESION08.ItemDuplicated;
-import SESION07.Ejercicio02.ArbolEjercicio2;
-
 public class AVLTreeWithRemove<E extends Comparable<E>> extends ArbolAVL<E> {
 
     @Override
     public E remove(E x) throws ItemDuplicated {
-        this.root = remove((NodeAVL) this.root, x);
-        return x;
-    }
-
-    protected Node remove(NodeAVL node, E x) throws ItemDuplicated {
-        if (node == null) {
+        this.height = false;
+        NodeAVL removedNode = (NodeAVL) search(this.root, x);
+        if (removedNode == null) {
             throw new ItemDuplicated(x + " no se encuentra en el árbol");
         }
-
-        int cmp = x.compareTo((E) node.getElem());
-
-        if (cmp < 0) {
-            node.setLeft(remove((NodeAVL) node.getLeft(), x));
-        } else if (cmp > 0) {
-            node.setRight(remove((NodeAVL) node.getRight(), x));
-        } else {
-            // Nodo encontrado: proceder a eliminar
-            if (node.getLeft() == null) {
-                return node.getRight();
-            } else if (node.getRight() == null) {
-                return node.getLeft();
-            } else {
-                // Nodo con dos hijos
-                NodeAVL temp = (NodeAVL) minSearch(node.getRight());
-                node.setElem(temp.getElem());
-                node.setRight(minOfMaxRemove((NodeAVL) node.getRight()));
-            }
-        }
-
-        // Actualizar factor de balance y rebalancear si es necesario
-        return balanceAfterDeletion(node);
+        this.root = removeAVL(x, (NodeAVL) this.root);
+        return removedNode.getElem();
     }
 
-    private NodeAVL balanceAfterDeletion(NodeAVL node) {
-        // Implementar lógica de rebalanceo similar a la inserción
-        // (Reutilizar métodos balanceToLeft y balanceToRight)
-        updateBF(node);
-
-        if (node.getBF() == 2) {
-            return balanceToLeft(node);
-        } else if (node.getBF() == -2) {
-            return balanceToRight(node);
+    protected NodeAVL removeAVL(E x, NodeAVL node) throws ItemDuplicated {
+        if (node == null) {
+            this.height = false;
+            return null;
         }
 
+        int resC = node.getElem().compareTo(x);
+        if (resC < 0) {
+            node.setRight(removeAVL(x, (NodeAVL) node.getRight()));
+            if (this.height) {
+                node = balanceAfterRemoval(node, false);
+            }
+        } else if (resC > 0) {
+            node.setLeft(removeAVL(x, (NodeAVL) node.getLeft()));
+            if (this.height) {
+                node = balanceAfterRemoval(node, true);
+            }
+        } else {
+            // Nodo encontrado, proceder a eliminarlo
+            if (node.getLeft() == null || node.getRight() == null) {
+                // Caso 1: Nodo tiene 0 o 1 hijo
+                this.height = true;
+                return (NodeAVL) (node.getLeft() != null ? node.getLeft() : node.getRight());
+            } else {
+                // Caso 2: Nodo tiene 2 hijos
+                NodeAVL minRight = (NodeAVL) minSearch(node.getRight());
+                node.setElem(minRight.getElem());
+                node.setRight(removeAVL(minRight.getElem(), (NodeAVL) node.getRight()));
+                if (this.height) {
+                    node = balanceAfterRemoval(node, false);
+                }
+            }
+        }
         return node;
     }
 
-    private void updateBF(NodeAVL node) {
-        // Actualizar factor de balance basado en las alturas de los hijos
-        int leftHeight = height(node.getLeft());
-        int rightHeight = height(node.getRight());
-        node.setBF(rightHeight - leftHeight);
+    private NodeAVL balanceAfterRemoval(NodeAVL node, boolean wasLeft) {
+        if (wasLeft) {
+            // Eliminación ocurrió en el subárbol izquierdo
+            switch (node.getBF()) {
+                case -1: // Se balanceó
+                    node.setBF(0);
+                    this.height = true;
+                    break;
+                case 0: // Se hizo más alto
+                    node.setBF(1);
+                    this.height = false;
+                    break;
+                case 1: // Desbalanceado
+                    NodeAVL right = (NodeAVL) node.getRight();
+                    int rightBF = right.getBF();
+
+                    if (rightBF >= 0) {
+                        node = balanceToLeft(node);
+                        this.height = node.getBF() != 0;
+                    } else {
+                        node = balanceToRightThenLeft(node);
+                        this.height = true;
+                    }
+                    break;
+            }
+        } else {
+            // Eliminación ocurrió en el subárbol derecho
+            switch (node.getBF()) {
+                case 1: // Se balanceó
+                    node.setBF(0);
+                    this.height = true;
+                    break;
+                case 0: // Se hizo más alto
+                    node.setBF(-1);
+                    this.height = false;
+                    break;
+                case -1: // Desbalanceado
+                    NodeAVL left = (NodeAVL) node.getLeft();
+                    int leftBF = left.getBF();
+
+                    if (leftBF <= 0) {
+                        node = balanceToRight(node);
+                        this.height = node.getBF() != 0;
+                    } else {
+                        node = balanceToLeftThenRight(node);
+                        this.height = true;
+                    }
+                    break;
+            }
+        }
+        return node;
     }
 
-    private NodeAVL minOfMaxRemove(NodeAVL node) {
-        if (node.getLeft() == null) {
-            return (NodeAVL) node.getRight();
-        }
-        node.setLeft(minOfMaxRemove((NodeAVL) node.getLeft()));
-        return balanceAfterDeletion(node);
+    private NodeAVL balanceToRightThenLeft(NodeAVL node) {
+        node.setRight(balanceToRight((NodeAVL) node.getRight()));
+        return balanceToLeft(node);
+    }
+
+    private NodeAVL balanceToLeftThenRight(NodeAVL node) {
+        node.setLeft(balanceToLeft((NodeAVL) node.getLeft()));
+        return balanceToRight(node);
     }
 }

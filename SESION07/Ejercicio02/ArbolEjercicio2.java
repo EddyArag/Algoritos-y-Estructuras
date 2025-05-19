@@ -1,7 +1,7 @@
 package SESION07.Ejercicio02;
 
 public class ArbolEjercicio2<E extends Comparable<E>> {
-    protected NodoEjercicio2<E> root;
+    public NodoEjercicio2<E> root;
 
     public ArbolEjercicio2() {
         this.root = null;
@@ -115,83 +115,68 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
             throw new ExceptionIsEmptyejer2("Árbol vacío");
 
         int height = getTreeHeight(root);
+        int maxLevel = height;
         QueueLink<NodoEjercicio2<E>> queue = new QueueLink<>();
         queue.enqueue(root);
 
-        // Calculamos el ancho máximo para imprimir
-        int maxWidth = (int) Math.pow(2, height) * 4;
+        int level = 1;
+        while (!queue.isEmpty() && level <= height) {
+            int currentElements = (int) Math.pow(2, level - 1);
+            int spacing = (int) Math.pow(2, maxLevel - level + 1) - 1;
+            int sideSpacing = (int) Math.pow(2, maxLevel - level) - 1;
 
-        for (int level = 1; level <= height; level++) {
-            int nodesInLevel = queue.size();
+            // Asegurar que los espacios no sean negativos
+            spacing = Math.max(0, spacing);
+            sideSpacing = Math.max(0, sideSpacing);
 
-            // Espacio inicial para centrar el primer nodo en la línea
-            int initialSpaces = maxWidth / (int) Math.pow(2, level);
+            // Imprimir nodos
+            StringBuilder nodeLine = new StringBuilder();
+            StringBuilder branchLine = new StringBuilder();
+            NodoEjercicio2<E>[] currentNodes = new NodoEjercicio2[currentElements];
 
-            // Espacio entre nodos de este nivel
-            int betweenSpaces = maxWidth / (int) Math.pow(2, level - 1) - initialSpaces;
-
-            // Construir la línea con los nodos
-            StringBuilder lineNodes = new StringBuilder();
-            lineNodes.append(" ".repeat(initialSpaces));
-
-            NodoEjercicio2<E>[] nodesArray = new NodoEjercicio2[nodesInLevel];
-            for (int i = 0; i < nodesInLevel; i++) {
+            for (int i = 0; i < currentElements; i++) {
                 NodoEjercicio2<E> node = queue.dequeue();
-                nodesArray[i] = node;
+                currentNodes[i] = node;
+
+                // Espacios antes del nodo
+                nodeLine.append(" ".repeat(sideSpacing));
 
                 if (node != null) {
-                    String valStr = String.format("%2s", node.getElem().toString());
-                    lineNodes.append(valStr);
+                    nodeLine.append(String.format("%2s", node.getElem()));
                     queue.enqueue(node.getLeft());
                     queue.enqueue(node.getRight());
                 } else {
-                    lineNodes.append("  ");
+                    nodeLine.append("  ");
                     queue.enqueue(null);
                     queue.enqueue(null);
                 }
 
-                if (i < nodesInLevel - 1) {
-                    lineNodes.append(" ".repeat(betweenSpaces));
-                }
+                // Espacios después del nodo
+                nodeLine.append(" ".repeat(spacing));
             }
-            System.out.println(lineNodes.toString());
+            System.out.println(nodeLine.toString());
 
-            // Línea de ramas, excepto en el último nivel
+            // Imprimir ramas (excepto último nivel)
             if (level < height) {
-                StringBuilder lineBranches = new StringBuilder();
-                // Menos espacios para las ramas que para los nodos
-                int branchInitialSpaces = initialSpaces - 1;
-                if (branchInitialSpaces < 0)
-                    branchInitialSpaces = 0;
-                lineBranches.append(" ".repeat(branchInitialSpaces));
+                for (int i = 0; i < currentElements; i++) {
+                    NodoEjercicio2<E> node = currentNodes[i];
 
-                for (int i = 0; i < nodesInLevel; i++) {
-                    NodoEjercicio2<E> node = nodesArray[i];
+                    branchLine.append(" ".repeat(sideSpacing > 0 ? sideSpacing - 1 : 0));
 
                     if (node != null) {
-                        // Rama izquierda
-                        if (node.getLeft() != null) {
-                            lineBranches.append(" /");
-                        } else {
-                            lineBranches.append("  ");
-                        }
-
-                        // Rama derecha
-                        if (node.getRight() != null) {
-                            lineBranches.append("\\ ");
-                        } else {
-                            lineBranches.append("  ");
-                        }
+                        branchLine.append(node.getLeft() != null ? "/" : " ");
+                        branchLine.append(" ".repeat(spacing));
+                        branchLine.append(node.getRight() != null ? "\\" : " ");
                     } else {
-                        lineBranches.append("    ");
+                        branchLine.append("   ").append(" ".repeat(spacing)).append(" ");
                     }
 
-                    if (i < nodesInLevel - 1) {
-                        lineBranches.append(" ".repeat(betweenSpaces));
-                    }
+                    branchLine.append(" ".repeat(sideSpacing > 0 ? sideSpacing - 1 : 0));
                 }
-                System.out.println(lineBranches.toString());
+                System.out.println(branchLine.toString());
             }
+
+            level++;
         }
     }
 
