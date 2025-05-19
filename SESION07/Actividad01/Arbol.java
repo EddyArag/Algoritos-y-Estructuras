@@ -1,5 +1,7 @@
 package SESION07.Actividad01;
 
+import SESION08.ItemDuplicated;
+
 public class Arbol<E extends Comparable<E>> {
     protected Node<E> root;
 
@@ -15,11 +17,11 @@ public class Arbol<E extends Comparable<E>> {
         root = null;
     }
 
-    public void insert(E x) throws ExceptionDuplicate {
+    public void insert(E x) throws ItemDuplicated {
         this.root = insert(this.root, x);
     }
 
-    public Node<E> insert(Node<E> actual, E x) throws ExceptionDuplicate {
+    public Node<E> insert(Node<E> actual, E x) throws ItemDuplicated {
         Node<E> anterior = actual;
         if (actual == null) {
             return new Node<E>(x);
@@ -30,19 +32,19 @@ public class Arbol<E extends Comparable<E>> {
             } else if (comp < 0) {
                 actual.setRight(insert(actual.getRight(), x));
             } else {
-                throw new ExceptionDuplicate("No se aceptan valores duplicados.");
+                throw new ItemDuplicated("No se aceptan valores duplicados.");
             }
         }
         return anterior;
     }
 
-    public E remove(E x) throws ExceptionDuplicate {
+    public E remove(E x) throws ItemDuplicated {
         return (remove(this.root, x)).getElem();
     }
 
-    public Node<E> remove(Node<E> actual, E x) throws ExceptionDuplicate {
+    public Node<E> remove(Node<E> actual, E x) throws ItemDuplicated {
         if (actual == null) {
-            throw new ExceptionDuplicate("No se encontró el elemento.");
+            throw new ItemDuplicated("No se encontró el elemento.");
         } else {
             int comp = actual.getElem().compareTo(x);
             if (comp > 0) {

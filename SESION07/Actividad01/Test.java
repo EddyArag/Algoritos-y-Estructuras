@@ -1,5 +1,7 @@
 package SESION07.Actividad01;
 
+import SESION08.ItemDuplicated;
+
 public class Test {
     public static void main(String[] args) {
         // Crear un objeto de tipo Arbol con elementos enteros
@@ -21,7 +23,7 @@ public class Test {
             // Imprimir el recorrido en orden después de eliminar un elemento
             System.out.println("Recorrido PostOrder después de eliminar 10: " + arbol.postOrder());
 
-        } catch (ExceptionDuplicate e) {
+        } catch (ItemDuplicated e) {
             e.printStackTrace();
         }
     }

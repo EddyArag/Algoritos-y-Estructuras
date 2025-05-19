@@ -1,6 +1,6 @@
 package SESION07.Ejercicio03;
 
-import SESION07.Actividad01.ExceptionDuplicate;
+import SESION08.ItemDuplicated;
 
 public class TestEjer3 {
     public static void main(String[] args) {
@@ -22,7 +22,7 @@ public class TestEjer3 {
             System.out.println("Representación con sangría del árbol BST:");
             arbol.parenthesize();
 
-        } catch (ExceptionDuplicate e) {
+        } catch (ItemDuplicated e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
