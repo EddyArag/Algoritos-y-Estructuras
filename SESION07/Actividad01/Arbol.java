@@ -3,7 +3,7 @@ package SESION07.Actividad01;
 import SESION08.ItemDuplicated;
 
 public class Arbol<E extends Comparable<E>> {
-    protected Node<E> root;
+    public Node<E> root;
 
     public Arbol() {
         this.root = null;

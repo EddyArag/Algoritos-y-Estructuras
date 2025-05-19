@@ -2,7 +2,6 @@ package SESION08;
 
 import SESION07.Actividad01.*;
 import SESION07.Ejercicio02.*;
-import SESION07.Ejercicio01.*;
 
 public class ArbolAVL<E extends Comparable<E>> extends Arbol<E> {
     class NodeAVL extends Node<E> {
@@ -182,6 +181,37 @@ public class ArbolAVL<E extends Comparable<E>> extends Arbol<E> {
         p.setRight(node);
         node = p;
         return node;
+    }
+
+    public int height() {
+        return heightSubtree((NodeAVL) this.root);
+    }
+
+    private int heightSubtree(NodeAVL node) {
+        if (node == null)
+            return -1;
+        int leftHeight = heightSubtree((NodeAVL) node.getLeft());
+        int rightHeight = heightSubtree((NodeAVL) node.getRight());
+        return 1 + Math.max(leftHeight, rightHeight);
+    }
+
+    @Override
+    public boolean search(E x) {
+        return search((NodeAVL) this.root, x);
+    }
+
+    private boolean search(NodeAVL actual, E x) {
+        if (actual == null) {
+            return false; // Si el nodo actual es nulo, el elemento no se encuentra
+        }
+        int comp = actual.getElem().compareTo(x);
+        if (comp > 0) {
+            return search((NodeAVL) actual.getLeft(), x); // Buscar en el subárbol izquierdo
+        } else if (comp < 0) {
+            return search((NodeAVL) actual.getRight(), x); // Buscar en el subárbol derecho
+        } else {
+            return true; // Se encontró el elemento
+        }
     }
 
 }
