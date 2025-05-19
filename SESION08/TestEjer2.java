@@ -1,6 +1,7 @@
 package SESION08;
 
 import SESION08.ItemDuplicated;
+import SESION07.Ejercicio02.ArbolEjercicio2;
 
 public class TestEjer2 {
     public static void main(String[] args) {
@@ -8,7 +9,7 @@ public class TestEjer2 {
             AVLTreeWithRemove<Integer> avl = new AVLTreeWithRemove<>();
 
             // Insertar elementos
-            int[] values = {10, 20, 30, 40, 50, 25};
+            int[] values = { 10, 20, 30, 40, 50, 25 };
             for (int val : values) {
                 avl.insertAVL(val);
             }

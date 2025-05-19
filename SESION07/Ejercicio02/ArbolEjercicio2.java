@@ -32,7 +32,8 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
     }
 
     private void destroyRec(NodoEjercicio2<E> node) {
-        if (node == null) return;
+        if (node == null)
+            return;
         destroyRec(node.getLeft());
         destroyRec(node.getRight());
         node.setLeft(null);
@@ -44,13 +45,15 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
     }
 
     private int countAllRec(NodoEjercicio2<E> node) {
-        if (node == null) return 0;
+        if (node == null)
+            return 0;
         return 1 + countAllRec(node.getLeft()) + countAllRec(node.getRight());
     }
 
     public int height(E x) throws ExceptionIsEmptyejer2 {
         NodoEjercicio2<E> node = search(root, x);
-        if (node == null) return -1;
+        if (node == null)
+            return -1;
 
         QueueLink<NodoEjercicio2<E>> queue = new QueueLink<>();
         queue.enqueue(node);
@@ -61,27 +64,33 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
             height++;
             for (int i = 0; i < size; i++) {
                 NodoEjercicio2<E> current = queue.dequeue();
-                if (current.getLeft() != null) queue.enqueue(current.getLeft());
-                if (current.getRight() != null) queue.enqueue(current.getRight());
+                if (current.getLeft() != null)
+                    queue.enqueue(current.getLeft());
+                if (current.getRight() != null)
+                    queue.enqueue(current.getRight());
             }
         }
         return height;
     }
 
     public int amplitude(int nivel) throws ExceptionIsEmptyejer2 {
-        if (root == null) return 0;
+        if (root == null)
+            return 0;
 
         QueueLink<NodoEjercicio2<E>> queue = new QueueLink<>();
         queue.enqueue(root);
         int currentLevel = 0;
 
         while (!queue.isEmpty()) {
-            if (currentLevel == nivel) return queue.size();
+            if (currentLevel == nivel)
+                return queue.size();
             int size = queue.size();
             for (int i = 0; i < size; i++) {
                 NodoEjercicio2<E> current = queue.dequeue();
-                if (current.getLeft() != null) queue.enqueue(current.getLeft());
-                if (current.getRight() != null) queue.enqueue(current.getRight());
+                if (current.getLeft() != null)
+                    queue.enqueue(current.getLeft());
+                if (current.getRight() != null)
+                    queue.enqueue(current.getRight());
             }
             currentLevel++;
         }
@@ -94,14 +103,16 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
     }
 
     private int countLeafRec(NodoEjercicio2<E> node) {
-        if (node == null) return 0;
+        if (node == null)
+            return 0;
         if (node.getLeft() == null && node.getRight() == null)
             return 1;
         return countLeafRec(node.getLeft()) + countLeafRec(node.getRight());
     }
 
     public void drawBST() throws ExceptionIsEmptyejer2 {
-        if (root == null) throw new ExceptionIsEmptyejer2("Árbol vacío");
+        if (root == null)
+            throw new ExceptionIsEmptyejer2("Árbol vacío");
 
         int height = getTreeHeight(root);
         QueueLink<NodoEjercicio2<E>> queue = new QueueLink<>();
@@ -114,10 +125,10 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
             int nodesInLevel = queue.size();
 
             // Espacio inicial para centrar el primer nodo en la línea
-            int initialSpaces = maxWidth / (int)Math.pow(2, level);
+            int initialSpaces = maxWidth / (int) Math.pow(2, level);
 
             // Espacio entre nodos de este nivel
-            int betweenSpaces = maxWidth / (int)Math.pow(2, level - 1) - initialSpaces;
+            int betweenSpaces = maxWidth / (int) Math.pow(2, level - 1) - initialSpaces;
 
             // Construir la línea con los nodos
             StringBuilder lineNodes = new StringBuilder();
@@ -150,7 +161,8 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
                 StringBuilder lineBranches = new StringBuilder();
                 // Menos espacios para las ramas que para los nodos
                 int branchInitialSpaces = initialSpaces - 1;
-                if (branchInitialSpaces < 0) branchInitialSpaces = 0;
+                if (branchInitialSpaces < 0)
+                    branchInitialSpaces = 0;
                 lineBranches.append(" ".repeat(branchInitialSpaces));
 
                 for (int i = 0; i < nodesInLevel; i++) {
@@ -184,24 +196,24 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
     }
 
     private int getTreeHeight(NodoEjercicio2<E> node) {
-        if (node == null) return 0;
+        if (node == null)
+            return 0;
         int leftHeight = getTreeHeight(node.getLeft());
         int rightHeight = getTreeHeight(node.getRight());
         return 1 + Math.max(leftHeight, rightHeight);
     }
 
-
-
-
     private void printTree(NodoEjercicio2<E> node, int level) {
-        if (node == null) return;
+        if (node == null)
+            return;
         printTree(node.getRight(), level + 1);
         System.out.println("  ".repeat(level) + node.getElem());
         printTree(node.getLeft(), level + 1);
     }
 
-    private NodoEjercicio2<E> search(NodoEjercicio2<E> node, E x) {
-        if (node == null || node.getElem().equals(x)) return node;
+    public NodoEjercicio2<E> search(NodoEjercicio2<E> node, E x) {
+        if (node == null || node.getElem().equals(x))
+            return node;
         return x.compareTo(node.getElem()) < 0
                 ? search(node.getLeft(), x)
                 : search(node.getRight(), x);

@@ -2,6 +2,7 @@ package SESION08;
 
 import SESION07.Actividad01.Node;
 import SESION08.ItemDuplicated;
+import SESION07.Ejercicio02.ArbolEjercicio2;
 
 public class AVLTreeWithRemove<E extends Comparable<E>> extends ArbolAVL<E> {
 

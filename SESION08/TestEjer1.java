@@ -2,6 +2,8 @@ package SESION08;
 
 import SESION07.Actividad01.Arbol;
 import SESION08.ItemDuplicated;
+import SESION07.Ejercicio02.*;
+import SESION07.Ejercicio01.*;
 
 public class TestEjer1 {
     public static void main(String[] args) {
@@ -10,11 +12,11 @@ public class TestEjer1 {
             System.out.println("--- Caso 1: Inserción ordenada ---");
 
             // Prueba con BST
-            Arbol<Integer> bst = new Arbol<>();
+            ArbolEjercicio2<Integer> bst = new ArbolEjercicio2<>();
             for (int i = 1; i <= 10; i++) {
                 bst.insert(i);
             }
-            System.out.println("Altura BST: " + bst.height());
+            System.out.println("Altura BST: " + bst.height(2));
 
             // Prueba con AVL
             ArbolAVL<Integer> avl = new ArbolAVL<>();
@@ -27,7 +29,7 @@ public class TestEjer1 {
             System.out.println("\n--- Caso 2: Tiempo de búsqueda ---");
 
             // BST grande desbalanceado
-            Arbol<Integer> bstLarge = new Arbol<>();
+            ArbolEjercicio2<Integer> bstLarge = new ArbolEjercicio2<>();
             for (int i = 1; i <= 10000; i++) {
                 bstLarge.insert(i);
             }
@@ -40,7 +42,7 @@ public class TestEjer1 {
 
             // Medir tiempo de búsqueda (esto es una aproximación)
             long start = System.nanoTime();
-            bstLarge.search(10000);
+            bstLarge.search(null, 100);
             long end = System.nanoTime();
             System.out.println("BST search time (ns): " + (end - start));
 
