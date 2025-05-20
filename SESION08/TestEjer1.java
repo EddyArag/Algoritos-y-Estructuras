@@ -3,7 +3,6 @@ package SESION08;
 import SESION07.Ejercicio02.ArbolEjercicio2;
 import SESION07.Ejercicio02.ExceptionDuplicateejer2;
 import SESION07.Ejercicio02.ExceptionIsEmptyejer2;
-import SESION08.ArbolAVL;
 
 public class TestEjer1 {
     public static void main(String[] args) throws ExceptionIsEmptyejer2, ItemDuplicated, ExceptionDuplicateejer2 {
@@ -26,13 +25,16 @@ public class TestEjer1 {
         bst.insert(50);
         bst.insert(30);
         bst.insert(60);
+        bst.insert(80);
+        bst.insert(15);
+        bst.insert(20);
 
         avl.insertAVL(50);
         avl.insertAVL(40);
         avl.insertAVL(45);
 
         // Mostrar alturas
-        System.out.println("Altura del BST: " + bst.height(1)); // Altura del nodo raíz
+        System.out.println("Altura del BST: " + bst.heightTotal()); // Altura del nodo raíz
         System.out.println("Altura del AVL: " + avl.height());
 
         // Dibujar los árboles

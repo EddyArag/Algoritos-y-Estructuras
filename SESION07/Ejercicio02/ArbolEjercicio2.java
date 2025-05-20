@@ -73,6 +73,34 @@ public class ArbolEjercicio2<E extends Comparable<E>> {
         return height;
     }
 
+    /**
+     * Calcula la altura total del árbol (desde la raíz hasta el nodo más profundo)
+     * 
+     * @return Altura total del árbol
+     * @throws ExceptionIsEmptyejer2 si el árbol está vacío
+     */
+    public int heightTotal() throws ExceptionIsEmptyejer2 {
+        if (root == null) {
+            throw new ExceptionIsEmptyejer2("Árbol vacío");
+        }
+        return heightTotalRec(root);
+    }
+
+    /**
+     * Método recursivo auxiliar para calcular la altura total
+     * 
+     * @param node Nodo actual
+     * @return Altura del subárbol que tiene a 'node' como raíz
+     */
+    private int heightTotalRec(NodoEjercicio2<E> node) {
+        if (node == null) {
+            return -1; // Convención estándar: hojas tienen altura 0
+        }
+        int leftHeight = heightTotalRec(node.getLeft());
+        int rightHeight = heightTotalRec(node.getRight());
+        return 1 + Math.max(leftHeight, rightHeight);
+    }
+
     public int amplitude(int nivel) throws ExceptionIsEmptyejer2 {
         if (root == null)
             return 0;
