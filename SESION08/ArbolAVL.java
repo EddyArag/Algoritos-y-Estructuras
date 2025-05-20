@@ -167,6 +167,16 @@ public class ArbolAVL<E extends Comparable<E>> extends Arbol<E> {
         return node;
     }
 
+    protected NodeAVL balanceToLeftThenRight(NodeAVL node) {
+        node.setLeft(balanceToLeft((NodeAVL) node.getLeft())); // Balanceamos el subárbol izquierdo
+        return balanceToRight(node); // Luego balanceamos el nodo actual
+    }
+
+    protected NodeAVL balanceToRightThenLeft(NodeAVL node) {
+        node.setRight(balanceToRight((NodeAVL) node.getRight())); // Balanceamos el subárbol derecho
+        return balanceToLeft(node); // Luego balanceamos el nodo actual
+    }
+
     private NodeAVL rotateSL(NodeAVL node) {
         NodeAVL p = (NodeAVL) node.getRight();
         node.setRight(p.getLeft());

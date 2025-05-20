@@ -79,7 +79,6 @@ public class AVLTreeWithRemove<E extends Comparable<E>> extends ArbolAVL<E> {
             NodeAVL right = (NodeAVL) node.getRight(); // Obtenemos el hijo derecho
             if (right.getBF() >= 0) {
                 node = balanceToLeft(node); // Rotación simple a la izquierda
-                // Después de la rotación, si el BF es 0, la altura se reduce
                 this.height = (node.getBF() == 0);
             } else {
                 node = balanceToRightThenLeft(node); // Rotación doble derecha-izquierda
@@ -104,104 +103,6 @@ public class AVLTreeWithRemove<E extends Comparable<E>> extends ArbolAVL<E> {
         }
 
         return node; // Retornamos el nodo actualizado
-    }
-
-    protected NodeAVL balanceToLeft(NodeAVL node) {
-        NodeAVL right = (NodeAVL) node.getRight(); // Obtenemos el hijo derecho
-        switch (right.getBF()) {
-            case 1:
-                node.setBF(0); // Ajustamos el BF del nodo actual
-                right.setBF(0); // Ajustamos el BF del hijo derecho
-                node = rotateSL(node); // Realizamos rotación simple a la izquierda
-                break;
-            case 0:
-                node.setBF(1); // Ajustamos el BF del nodo actual
-                right.setBF(-1); // Ajustamos el BF del hijo derecho
-                node = rotateSL(node); // Realizamos rotación simple a la izquierda
-                break;
-            case -1:
-                NodeAVL rightLeft = (NodeAVL) right.getLeft(); // Obtenemos el hijo izquierdo del hijo derecho
-                switch (rightLeft.getBF()) {
-                    case 1:
-                        node.setBF(-1); // Ajustamos el BF del nodo actual
-                        right.setBF(0); // Ajustamos el BF del hijo derecho
-                        break;
-                    case 0:
-                        node.setBF(0); // Ambos nodos quedan balanceados
-                        right.setBF(0);
-                        break;
-                    case -1:
-                        node.setBF(0); // Ajustamos el BF del nodo actual
-                        right.setBF(1); // Ajustamos el BF del hijo derecho
-                        break;
-                }
-                rightLeft.setBF(0); // Ajustamos el BF del nieto
-                node.setRight(rotateSR(right)); // Realizamos rotación simple a la derecha en el hijo derecho
-                node = rotateSL(node); // Realizamos rotación simple a la izquierda
-                break;
-        }
-        return node; // Retornamos el nodo actualizado
-    }
-
-    public NodeAVL balanceToRight(NodeAVL node) {
-        NodeAVL left = (NodeAVL) node.getLeft(); // Obtenemos el hijo izquierdo
-        switch (left.getBF()) {
-            case -1:
-                node.setBF(0); // Ajustamos el BF del nodo actual
-                left.setBF(0); // Ajustamos el BF del hijo izquierdo
-                node = rotateSR(node); // Realizamos rotación simple a la derecha
-                break;
-            case 0:
-                node.setBF(-1); // Ajustamos el BF del nodo actual
-                left.setBF(1); // Ajustamos el BF del hijo izquierdo
-                node = rotateSR(node); // Realizamos rotación simple a la derecha
-                break;
-            case 1:
-                NodeAVL leftRight = (NodeAVL) left.getRight(); // Obtenemos el hijo derecho del hijo izquierdo
-                switch (leftRight.getBF()) {
-                    case -1:
-                        node.setBF(1); // Ajustamos el BF del nodo actual
-                        left.setBF(0); // Ajustamos el BF del hijo izquierdo
-                        break;
-                    case 0:
-                        node.setBF(0); // Ambos nodos quedan balanceados
-                        left.setBF(0);
-                        break;
-                    case 1:
-                        node.setBF(0); // Ajustamos el BF del nodo actual
-                        left.setBF(-1); // Ajustamos el BF del hijo izquierdo
-                        break;
-                }
-                leftRight.setBF(0); // Ajustamos el BF del nieto
-                node.setLeft(rotateSL(left)); // Realizamos rotación simple a la izquierda en el hijo izquierdo
-                node = rotateSR(node); // Realizamos rotación simple a la derecha
-                break;
-        }
-        return node; // Retornamos el nodo actualizado
-    }
-
-    private NodeAVL balanceToRightThenLeft(NodeAVL node) {
-        node.setRight(balanceToRight((NodeAVL) node.getRight())); // Balanceamos el subárbol derecho
-        return balanceToLeft(node); // Luego balanceamos el nodo actual
-    }
-
-    private NodeAVL balanceToLeftThenRight(NodeAVL node) {
-        node.setLeft(balanceToLeft((NodeAVL) node.getLeft())); // Balanceamos el subárbol izquierdo
-        return balanceToRight(node); // Luego balanceamos el nodo actual
-    }
-
-    private NodeAVL rotateSL(NodeAVL node) {
-        NodeAVL p = (NodeAVL) node.getRight(); // Obtenemos el hijo derecho
-        node.setRight(p.getLeft()); // Ajustamos el subárbol derecho
-        p.setLeft(node); // Realizamos la rotación
-        return p; // Retornamos el nuevo nodo raíz
-    }
-
-    private NodeAVL rotateSR(NodeAVL node) {
-        NodeAVL p = (NodeAVL) node.getLeft(); // Obtenemos el hijo izquierdo
-        node.setLeft(p.getRight()); // Ajustamos el subárbol izquierdo
-        p.setRight(node); // Realizamos la rotación
-        return p; // Retornamos el nuevo nodo raíz
     }
 
     public Node minSearch(Node node) {
