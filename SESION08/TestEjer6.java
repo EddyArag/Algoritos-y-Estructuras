@@ -21,7 +21,7 @@ public class TestEjer6 {
         System.out.println("Altura: " + avl.height());
 
         System.out.println("\nEliminando 20...");
-        avl.remove(20);
+        avl.remove(35);
         System.out.println("Árbol AVL después de eliminar 20:");
         avl.drawAVL();
         System.out.println("Altura después: " + avl.height());
@@ -44,9 +44,13 @@ public class TestEjer6 {
         avl.drawAVL();
         System.out.println("Altura: " + avl.height());
 
-        System.out.println("\nEliminando 80... (debería provocar rotación doble derecha-izquierda)");
+        System.out.println("\nEliminando 80...");
         avl.remove(80);
         System.out.println("Árbol AVL después de eliminar 80:");
+        avl.drawAVL();
+        System.out.println("\nEliminando 70... (debería provocar rotación doble derecha-izquierda)");
+        avl.remove(70);
+        System.out.println("Árbol AVL después de eliminar 70:");
         avl.drawAVL();
         System.out.println("Altura después: " + avl.height());
 
