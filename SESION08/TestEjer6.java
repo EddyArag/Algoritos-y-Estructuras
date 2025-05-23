@@ -21,7 +21,7 @@ public class TestEjer6 {
         System.out.println("Altura: " + avl.height());
 
         System.out.println("\nEliminando 20...");
-        avl.remove(35);
+        avl.remove(20);
         System.out.println("Árbol AVL después de eliminar 20:");
         avl.drawAVL();
         System.out.println("Altura después: " + avl.height());
