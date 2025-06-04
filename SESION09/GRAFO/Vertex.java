@@ -1,6 +1,7 @@
 package SESION09.GRAFO;
+import SESION09.LISTA.LinkedList;
 
-public class Vertex<E> {
+public class Vertex<E extends Comparable<E>> implements Comparable<Vertex<E>> {
     private E data;
     protected LinkedList<Edge<E>> listAdj;
 
@@ -17,6 +18,9 @@ public class Vertex<E> {
             return this.data.equals(v.data);
         }
         return false;
+    }
+    public int compareTo(Vertex<E> otherVertex) {
+        return this.data.compareTo(otherVertex.data);
     }
     public String toString() {
         return this.data + " --> " + this.listAdj.toString() + "\n";

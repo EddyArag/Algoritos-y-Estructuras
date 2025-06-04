@@ -1,20 +1,22 @@
+package SESION09;
+
 public class Node<T extends Comparable<T>> implements Comparable<T>{
-    private T elemento;
+    private T data;
     private Node<T> next;
     //Constructor de la clase Node
-    public Node(T elemento) {
-        this.elemento = elemento;
+    public Node(T data) {
+        this.data = data;
         this.next = null;
     }
 
     //Setters y Getters de elemento y next
-    public void setElemento(T elemento) { this.elemento = elemento; }
-    public T getElemento() { return elemento; }
+    public void setData(T data) { this.data = data; }
+    public T getData() { return data; }
     public void setNext(Node<T> next){ this.next = next; }
     public Node<T> getNext(){ return next; }
     
     //Método comparteTo para comparar tipos genéricos
-    public int compareTo(T otroElemento){
-        return elemento.compareTo(otroElemento);
+    public int compareTo(T otherData){
+        return data.compareTo(otherData);
     }
 }
