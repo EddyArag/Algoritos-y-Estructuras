@@ -1,4 +1,4 @@
-package SESION09;
+package SESION09.LISTA;
 
 public class Node<T extends Comparable<T>> implements Comparable<T>{
     private T data;

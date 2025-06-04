@@ -1,4 +1,4 @@
-package SESION09.LISTADELISTAS;
+package SESION09.LISTA;
 
 public class LinkedList<T extends Comparable<T>> {
     private Node<T> first;

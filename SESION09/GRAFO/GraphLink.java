@@ -1,5 +1,5 @@
 package SESION09.GRAFO;
-import SESION09.LISTA.*;;
+import SESION09.LISTA.*;
 
 public class GraphLink<E extends Comparable<E>> {
     protected LinkedList<Vertex<E>> listVertex;
