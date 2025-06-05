@@ -8,8 +8,17 @@ public class GraphLink<E extends Comparable<E>> {
         listVertex = new LinkedList<Vertex<E>>();
     }
 
-    public void insertVertext(E data) {
+    public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
+        if(listVertex.search(vertex) == -1) {
+            return false;
+        }
+        return true;
+    }
+    public boolean searchEdge(Vertex<E> verOri, Vertex<E> verDes) {
 
+    }
+    public void insertVertext(E vertex) {
+        
     }
     public void insertEdge(E verOri, E verDes) {
 
