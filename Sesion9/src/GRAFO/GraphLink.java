@@ -1,24 +1,24 @@
 package Sesion9.src.GRAFO;
 
-import java.util.ArrayList;
-
 import Sesion9.src.LISTA.ExceptionEmptyLinkedList;
 import Sesion9.src.LISTA.LinkedList;
 import Sesion9.src.LISTA.Node;
+import Sesion9.src.PILA.ExceptionIsEmpty;
+import Sesion9.src.PILA.Stack;
+import Sesion9.src.PILA.StackArray;
 
 public class GraphLink<E extends Comparable<E>> {
     protected LinkedList<Vertex<E>> listVertex;
 
     public GraphLink() {
-        listVertex = new LinkedList<Vertex<E>>();
+        listVertex = new LinkedList<>();
     }
 
-    // 1.1.a) Busca un vértice en el grafo
+    // Métodos básicos existentes (sin cambios)
     public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
         return listVertex.search(vertex) != -1;
     }
 
-    // 1.1.b) Busca una arista entre dos vértices
     public boolean searchEdge(Vertex<E> verOri, Vertex<E> verDes) throws ExceptionEmptyLinkedList {
         if (!searchVertex(verOri) || !searchVertex(verDes)) {
             return false;
@@ -40,6 +40,208 @@ public class GraphLink<E extends Comparable<E>> {
             current = current.getNext();
         }
         return false;
+    }
+
+    // Métodos modificados/mejorados
+    public void insertEdgeWeight(E verOri, E verDes, int weight) throws ExceptionEmptyLinkedList {
+        Vertex<E> origin = new Vertex<>(verOri);
+        Vertex<E> destination = new Vertex<>(verDes);
+
+        if (!searchVertex(origin) || !searchVertex(destination)) {
+            System.out.println("Uno o ambos vértices no existen");
+            return;
+        }
+
+        // Insertar en ambas direcciones (grafo no dirigido)
+        insertDirectedEdge(origin, destination, weight);
+        insertDirectedEdge(destination, origin, weight);
+    }
+
+    private void insertDirectedEdge(Vertex<E> from, Vertex<E> to, int weight) throws ExceptionEmptyLinkedList {
+        Node<Vertex<E>> current = listVertex.getFirst();
+        while (current != null) {
+            if (current.getData().equals(from)) {
+                Edge<E> newEdge = new Edge<>(to, weight);
+                if (current.getData().listAdj.search(newEdge) == -1) {
+                    current.getData().listAdj.addLast(newEdge);
+                }
+                break;
+            }
+            current = current.getNext();
+        }
+    }
+
+    // Implementación completa de Dijkstra
+    public ArrayList<Vertex<E>> shortPath(Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
+        if (!searchVertex(start) || !searchVertex(end)) {
+            return new ArrayList<>();
+        }
+
+        // Estructuras para Dijkstra
+        LinkedList<Vertex<E>> vertices = getAllVertices();
+        LinkedList<Integer> distances = new LinkedList<>();
+        LinkedList<Vertex<E>> predecessors = new LinkedList<>();
+        LinkedList<Vertex<E>> unvisited = new LinkedList<>();
+
+        // Inicialización
+        Node<Vertex<E>> current = vertices.getFirst();
+        while (current != null) {
+            distances.addLast(Integer.MAX_VALUE);
+            predecessors.addLast(null);
+            unvisited.addLast(current.getData());
+            current = current.getNext();
+        }
+        setDistance(distances, vertices, start, 0);
+
+        while (!unvisited.isEmptyList()) {
+            Vertex<E> u = getVertexWithMinDistance(unvisited, distances, vertices);
+            unvisited.removeNode(u);
+
+            // Para cada vecino de u
+            Node<Edge<E>> edgeNode = getVertexNode(u).getData().listAdj.getFirst();
+            while (edgeNode != null) {
+                Vertex<E> neighbor = edgeNode.getData().getRefDest();
+                int alt = getDistance(distances, vertices, u) + edgeNode.getData().getWeight();
+                if (alt < getDistance(distances, vertices, neighbor)) {
+                    setDistance(distances, vertices, neighbor, alt);
+                    setPredecessor(predecessors, vertices, neighbor, u);
+                }
+                edgeNode = edgeNode.getNext();
+            }
+        }
+
+        // Reconstruir camino
+        return reconstructPath(predecessors, vertices, start, end);
+    }
+
+    // Métodos auxiliares para Dijkstra
+    private LinkedList<Vertex<E>> getAllVertices() throws ExceptionEmptyLinkedList {
+        LinkedList<Vertex<E>> vertices = new LinkedList<>();
+        Node<Vertex<E>> current = listVertex.getFirst();
+        while (current != null) {
+            vertices.addLast(current.getData());
+            current = current.getNext();
+        }
+        return vertices;
+    }
+
+    private int getDistance(LinkedList<Integer> distances, LinkedList<Vertex<E>> vertices, Vertex<E> v) throws ExceptionEmptyLinkedList {
+        int index = vertices.search(v);
+        return index != -1 ? distances.get(index) : Integer.MAX_VALUE;
+    }
+
+    private void setDistance(LinkedList<Integer> distances, LinkedList<Vertex<E>> vertices, Vertex<E> v, int value) throws ExceptionEmptyLinkedList {
+        int index = vertices.search(v);
+        if (index != -1) {
+            distances.set(index, value);
+        }
+    }
+
+    private void setPredecessor(LinkedList<Vertex<E>> predecessors, LinkedList<Vertex<E>> vertices, Vertex<E> v, Vertex<E> pred) throws ExceptionEmptyLinkedList {
+        int index = vertices.search(v);
+        if (index != -1) {
+            predecessors.set(index, pred);
+        }
+    }
+
+    private Vertex<E> getVertexWithMinDistance(LinkedList<Vertex<E>> unvisited, LinkedList<Integer> distances, LinkedList<Vertex<E>> vertices) throws ExceptionEmptyLinkedList {
+        Vertex<E> minVertex = null;
+        int minDistance = Integer.MAX_VALUE;
+        
+        Node<Vertex<E>> current = unvisited.getFirst();
+        while (current != null) {
+            int currentDist = getDistance(distances, vertices, current.getData());
+            if (currentDist < minDistance) {
+                minDistance = currentDist;
+                minVertex = current.getData();
+            }
+            current = current.getNext();
+        }
+        return minVertex;
+    }
+
+    private ArrayList<Vertex<E>> reconstructPath(LinkedList<Vertex<E>> predecessors, LinkedList<Vertex<E>> vertices, Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
+        ArrayList<Vertex<E>> path = new ArrayList<>();
+        Vertex<E> step = end;
+        
+        if (getPredecessor(predecessors, vertices, end) == null && !end.equals(start)) {
+            return path; // No hay camino
+        }
+        
+        while (step != null) {
+            path.add(0, step);
+            step = getPredecessor(predecessors, vertices, step);
+        }
+        return path;
+    }
+
+    private Vertex<E> getPredecessor(LinkedList<Vertex<E>> predecessors, LinkedList<Vertex<E>> vertices, Vertex<E> v) throws ExceptionEmptyLinkedList {
+        int index = vertices.search(v);
+        return index != -1 ? predecessors.get(index) : null;
+    }
+
+    private Node<Vertex<E>> getVertexNode(Vertex<E> v) throws ExceptionEmptyLinkedList {
+        Node<Vertex<E>> current = listVertex.getFirst();
+        while (current != null) {
+            if (current.getData().equals(v)) {
+                return current;
+            }
+            current = current.getNext();
+        }
+        return null;
+    }
+
+    // Implementación de isConexo() mejorada
+    public boolean isConexo() throws ExceptionEmptyLinkedList {
+        if (listVertex.isEmptyList()) {
+            return true;
+        }
+
+        Vertex<E> start = listVertex.getFirst().getData();
+        LinkedList<Vertex<E>> visited = new LinkedList<>();
+        bfs(start, visited);
+
+        // Verificar si todos los vértices fueron visitados
+        Node<Vertex<E>> current = listVertex.getFirst();
+        while (current != null) {
+            if (visited.search(current.getData()) == -1) {
+                return false;
+            }
+            current = current.getNext();
+        }
+        return true;
+    }
+
+    private void bfs(Vertex<E> start, LinkedList<Vertex<E>> visited) throws ExceptionEmptyLinkedList {
+        LinkedList<Vertex<E>> queue = new LinkedList<>();
+        queue.addLast(start);
+        visited.addLast(start);
+
+        while (!queue.isEmptyList()) {
+            Vertex<E> current = queue.getFirst().getData();
+            queue.removeNode(current);
+
+            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
+            while (edgeNode != null) {
+                Vertex<E> neighbor = edgeNode.getData().getRefDest();
+                if (visited.search(neighbor) == -1) {
+                    visited.addLast(neighbor);
+                    queue.addLast(neighbor);
+                }
+                edgeNode = edgeNode.getNext();
+            }
+        }
+    }
+
+    // Implementación de Dijsktra() usando StackArray
+    public StackArray<Vertex<E>> Dijsktra(Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
+        ArrayList<Vertex<E>> path = shortPath(start, end);
+        StackArray<Vertex<E>> stack = new StackArray<>(path.size());
+        
+        for (int i = path.size() - 1; i >= 0; i--) {
+            stack.push(path.get(i));
+        }
+        return stack;
     }
 
     // Elimina un vértice del grafo
@@ -180,92 +382,64 @@ public class GraphLink<E extends Comparable<E>> {
 
     // --- 2. BFS Path (Camino más corto entre v y z) ---
     public ArrayList<Vertex<E>> bfsPath(Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
-        ArrayList<Vertex<E>> path = new ArrayList<>();
-        if (!searchVertex(start) || !searchVertex(end)) {
-            return path; // Lista vacía si no existe alguno de los vértices
+    ArrayList<Vertex<E>> path = new ArrayList<>();
+    if (!searchVertex(start) || !searchVertex(end)) {
+        return path; // Lista vacía si no existe alguno de los vértices
+    }
+
+    LinkedList<Vertex<E>> queue = new LinkedList<>();
+    LinkedList<Vertex<E>> visited = new LinkedList<>();
+    ArrayList<Vertex<E>> padres = new ArrayList<>();
+    ArrayList<Vertex<E>> hijos = new ArrayList<>();
+
+    queue.addLast(start);
+    visited.addLast(start);
+
+    boolean found = false;
+
+    while (!queue.isEmptyList() && !found) {
+        Vertex<E> current = queue.getFirst().getData();
+        queue.removeNode(current);
+
+        if (current.equals(end)) {
+            found = true;
+            break;
         }
 
-        // Estructuras para BFS
-        LinkedList<Vertex<E>> queue = new LinkedList<>();
-        LinkedList<Vertex<E>> visited = new LinkedList<>();
-        // Mapeo para reconstruir el camino (usamos un ArrayList temporal)
-        ArrayList<Vertex<E>> parentMap = new ArrayList<>();
-
-        queue.addLast(start);
-        visited.addLast(start);
-        parentMap.add(start); // Asumimos que el primer vértice no tiene padre (null)
-
-        boolean found = false;
-
-        while (!queue.isEmptyList() && !found) {
-            Vertex<E> current = queue.getFirst().getData();
-            queue.removeNode(current);
-
-            // Si encontramos el destino, terminamos
-            if (current.equals(end)) {
-                found = true;
-                break;
+        Node<Edge<E>> edgeNode = current.listAdj.getFirst();
+        while (edgeNode != null) {
+            Vertex<E> neighbor = edgeNode.getData().getRefDest();
+            if (visited.search(neighbor) == -1) {
+                visited.addLast(neighbor);
+                queue.addLast(neighbor);
+                hijos.add(neighbor);
+                padres.add(current);
             }
-
-            // Exploramos los vecinos
-            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
-            while (edgeNode != null) {
-                Vertex<E> neighbor = edgeNode.getData().getRefDest();
-                if (visited.search(neighbor) == -1) {
-                    visited.addLast(neighbor);
-                    queue.addLast(neighbor);
-                    parentMap.add(neighbor); // Guardamos el vértice actual como "padre" del vecino
-                }
-                edgeNode = edgeNode.getNext();
-            }
+            edgeNode = edgeNode.getNext();
         }
+    }
 
-        // Reconstruimos el camino desde 'end' hasta 'start' (si existe)
-        if (found) {
-            Vertex<E> node = end;
-            while (node != null) {
-                path.add(0, node); // Insertamos al inicio para invertir el orden
-                // Buscamos el padre de 'node' en parentMap (simplificado)
-                // En una implementación más robusta, usaríamos un HashMap para rastrear padres.
-                node = findParent(parentMap, node);
-            }
+    if (found) {
+        Vertex<E> node = end;
+        while (node != null) {
+            path.add(0, node);
+            node = findParent(padres, hijos, node);
         }
-
-        return path;
     }
 
-    // Método auxiliar para encontrar el padre de un vértice en BFS
-    private Vertex<E> findParent(ArrayList<Vertex<E>> parentMap, Vertex<E> node) {
-        // Esto es una simplificación. En una implementación real, deberíamos llevar un
-        // registro de padres.
-        // Aquí asumimos que el padre está antes en la lista (no es óptimo, pero
-        // funciona para el ejemplo).
-        int index = parentMap.indexOf(node);
-        if (index <= 0)
-            return null; // No tiene padre o es el inicio
-        return parentMap.get(index - 1);
-    }
-
-    public boolean isConexo() throws ExceptionEmptyLinkedList {
-    if (listVertex.isEmptyList()) {
-        return true;  // Grafo vacío se considera conexo
-    }
-
-    Vertex<E> start = listVertex.getFirst().getData();  // Tomamos el primer vértice
-    LinkedList<Vertex<E>> visited = new LinkedList<>();  // Para rastrear visitados
-    dfsRecursive(start, visited);  // Recorrido DFS
-
-    // Verificar si todos los vértices están en 'visited'
-    Node<Vertex<E>> current = listVertex.getFirst();
-    while (current != null) {
-        if (visited.search(current.getData()) == -1) {
-            return false;  // Hay un vértice no visitado
-        }
-        current = current.getNext();
-    }
-    return true;
+    return path;
 }
 
+private Vertex<E> findParent(ArrayList<Vertex<E>> padres, ArrayList<Vertex<E>> hijos, Vertex<E> node) {
+    for (int i = 0; i < hijos.size(); i++) {
+        if (hijos.get(i).equals(node)) {
+            return padres.get(i);
+        }
+    }
+    return null;
+}
+
+   
     public String toString() {
         return this.listVertex.toString();
     }
