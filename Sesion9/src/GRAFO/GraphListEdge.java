@@ -1,114 +1,75 @@
 package Sesion9.src.GRAFO;
 
-import Sesion9.src.LISTA.LinkedList;
-import Sesion9.src.LISTA.ExceptionEmptyLinkedList;
-import Sesion9.src.LISTA.Node;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
-public class GraphListEdge<E extends Comparable<E>> {
-    private LinkedList<Vertex<E>> listVertex;
-    private LinkedList<Edge<E>> listEdge;
+public class GraphListEdge<V, E> {
+    ArrayList<VertexObj<V, E>> secVertex;
+    ArrayList<EdgeObj<V, E>> secEdge;
 
     public GraphListEdge() {
-        this.listVertex = new LinkedList<>();
-        this.listEdge = new LinkedList<>();
+        this.secVertex = new ArrayList<>();
+        this.secEdge = new ArrayList<>();
     }
 
-    public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            if (current.getData().compareTo(vertex) == 0) {
+    public boolean searchVertex(VertexObj<V, E> v) {
+        return secVertex.contains(v);
+    }
+
+    public void insertVertex(V info) {
+        for (VertexObj<V, E> v : secVertex) {
+            if (v.getInfo().equals(info)) return;
+        }
+        secVertex.add(new VertexObj<>(info, secVertex.size()));
+    }
+
+    public boolean searchEdge(VertexObj<V, E> v1, VertexObj<V, E> v2) {
+        for (EdgeObj<V, E> e : secEdge) {
+            if (e.getEndVertex1().equals(v1) && e.getEndVertex2().equals(v2)) {
                 return true;
             }
-            current = current.getNext();
         }
         return false;
     }
 
-    public void insertVertex(E data) throws ExceptionEmptyLinkedList {
-        Vertex<E> newVertex = new Vertex<>(data);
-        if (!searchVertex(newVertex)) {
-            listVertex.addLast(newVertex);
+    public void insertEdge(V info1, V info2, E infoEdge) {
+        VertexObj<V, E> v1 = null, v2 = null;
+        for (VertexObj<V, E> v : secVertex) {
+            if (v.getInfo().equals(info1)) v1 = v;
+            if (v.getInfo().equals(info2)) v2 = v;
         }
-    }
-
-    public boolean searchEdge(Vertex<E> v1, Vertex<E> v2) throws ExceptionEmptyLinkedList {
-        Node<Edge<E>> node = listEdge.getFirst();
-        while (node != null) {
-            Edge<E> edge = node.getData();
-            if ((edge.getRefDest().compareTo(v1) == 0 && node.getData().getRefDest().compareTo(v2) == 0) ||
-                (edge.getRefDest().compareTo(v2) == 0 && node.getData().getRefDest().compareTo(v1) == 0)) {
-                return true;
-            }
-            node = node.getNext();
-        }
-        return false;
-    }
-
-    public void insertEdge(E data1, E data2, int weight) throws ExceptionEmptyLinkedList {
-        Vertex<E> v1 = getVertex(data1);
-        Vertex<E> v2 = getVertex(data2);
-        
-        if (v1 == null || v2 == null) {
-            System.out.println("Uno o ambos vértices no existen");
-            return;
-        }
-        
+        if (v1 == null || v2 == null) return;
         if (!searchEdge(v1, v2)) {
-            Edge<E> newEdge1 = new Edge<>(v2, weight);
-            Edge<E> newEdge2 = new Edge<>(v1, weight);
-            v1.listAdj.addLast(newEdge1);
-            v2.listAdj.addLast(newEdge2);
-            listEdge.addLast(newEdge1);
+            secEdge.add(new EdgeObj<>(v1, v2, infoEdge, secEdge.size()));
         }
     }
 
-    private Vertex<E> getVertex(E data) throws ExceptionEmptyLinkedList {
-        Node<Vertex<E>> node = listVertex.getFirst();
-        while (node != null) {
-            if (node.getData().getData().equals(data)) {
-                return node.getData();
+    public void bfs(V startInfo) {
+        VertexObj<V, E> start = null;
+        for (VertexObj<V, E> v : secVertex) {
+            if (v.getInfo().equals(startInfo)) {
+                start = v;
+                break;
             }
-            node = node.getNext();
         }
-        return null;
-    }
-
-    public void bfs(E start) throws ExceptionEmptyLinkedList {
-        LinkedList<Vertex<E>> queue = new LinkedList<>();
-        LinkedList<Vertex<E>> visited = new LinkedList<>();
-
-        Vertex<E> startVertex = getVertex(start);
-        if (startVertex == null) return;
-
-        queue.addLast(startVertex);
-        visited.addLast(startVertex);
-
-        while (!queue.isEmptyList()) {
-            Vertex<E> current = queue.getFirst().getData();
-            queue.removeNode(current);
-            System.out.println(current.getData());
-
-            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
-            while (edgeNode != null) {
-                Vertex<E> neighbor = edgeNode.getData().getRefDest();
-                if (visited.search(neighbor) == -1) {
-                    visited.addLast(neighbor);
-                    queue.addLast(neighbor);
+        if (start == null) return;
+        Queue<VertexObj<V, E>> queue = new LinkedList<>();
+        ArrayList<VertexObj<V, E>> visited = new ArrayList<>();
+        queue.add(start);
+        visited.add(start);
+        while (!queue.isEmpty()) {
+            VertexObj<V, E> current = queue.poll();
+            System.out.println(current.getInfo());
+            for (EdgeObj<V, E> e : secEdge) {
+                VertexObj<V, E> neighbor = null;
+                if (e.getEndVertex1().equals(current)) neighbor = e.getEndVertex2();
+                else if (e.getEndVertex2().equals(current)) neighbor = e.getEndVertex1();
+                if (neighbor != null && !visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
                 }
-                edgeNode = edgeNode.getNext();
             }
         }
     }
-
-    @Override
-    public String toString() {
-    StringBuilder sb = new StringBuilder();
-    Node<Vertex<E>> node = listVertex.getFirst();
-    while (node != null) {
-        sb.append(node.getData().toString());
-        node = node.getNext();
-    }
-    return sb.toString();
-}
-
 }
