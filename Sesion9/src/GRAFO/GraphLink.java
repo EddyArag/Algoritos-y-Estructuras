@@ -409,6 +409,138 @@ public class GraphLink<E extends Comparable<E>> {
         return path;
     }
 
+    // Este método identifica el tipo de grafo según el grado de los vértices
+    public void identificarTipoGrafo() {
+        int n = listVertex.length();
+
+        // Mostrar los grados de todos los vértices
+        System.out.println("Grado de cada nodo:");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                int grado = vertex.listAdj.length();
+                System.out.println("Nodo " + vertex.getData() + ": G" + grado);
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        // Revisar tipo de grafo por los grados de los vértices
+        int countGrado1 = 0;
+        int countGrado2 = 0;
+        int countGrado3 = 0;
+        int countGradoN_1 = 0;
+
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                int grado = vertex.listAdj.length();
+
+                if (grado == 1) {
+                    countGrado1++;
+                } else if (grado == 2) {
+                    countGrado2++;
+                } else if (grado == 3) {
+                    countGrado3++;
+                } else if (grado == n - 1) {
+                    countGradoN_1++;
+                }
+
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        // Verificar tipo de grafo
+        if (countGradoN_1 == n) {
+            System.out.println("El grafo es COMPLETO: K" + n);
+        } else if (countGrado1 == 2 && countGrado2 == n - 2) {
+            System.out.println("El grafo es un CAMINO: P" + n);
+        } else if (countGrado2 == n) {
+            System.out.println("El grafo es un CICLO: C" + n);
+        } else if (countGradoN_1 == 1 && countGrado3 == n - 1) {
+            System.out.println("El grafo es una RUEDA: W" + n);
+        } else {
+            System.out.println("El grafo no corresponde a un tipo definido (Camino, Ciclo, Rueda, Completo).");
+        }
+    }
+
+    // Este método muestra un grafo de 3 formas diferentes: Formal, Lista de Adyacencia, Matriz de Adyacencia
+    public void mostrarFormasGrafo() {
+        int n = listVertex.length();
+
+        // Representación Formal
+        System.out.println("\n--- Representación FORMAL ---");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                System.out.print("Nodo " + vertex.getData() + " conectado a: ");
+                for (int j = 0; j < vertex.listAdj.length(); j++) {
+                    Edge<E> edge = vertex.listAdj.get(j);
+                    System.out.print(edge.getRefDest().getData() + " ");
+                }
+                System.out.println();
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        // Representación de Lista de Adyacencia
+        System.out.println("\n--- Lista de ADYACENCIAS ---");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                System.out.print(vertex.getData() + " --> ");
+                System.out.println(vertex.listAdj.toString());
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        // Representación de la Matriz de Adyacencia
+        System.out.println("\n--- MATRIZ de ADYACENCIA ---");
+        int[][] matriz = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                for (int j = 0; j < vertex.listAdj.length(); j++) {
+                    Edge<E> edge = vertex.listAdj.get(j);
+                    Vertex<E> dest = edge.getRefDest();
+                    int indexDest = listVertex.search(dest);
+                    if (indexDest != -1) {
+                        matriz[i][indexDest] = 1;
+                    }
+                }
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        // Mostrar la matriz
+        System.out.print("   ");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                System.out.print(vertex.getData() + " ");
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.print("? ");
+            }
+        }
+        System.out.println();
+
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                System.out.print(vertex.getData() + " ");
+                for (int j = 0; j < n; j++) {
+                    System.out.print(" " + matriz[i][j] + " ");
+                }
+                System.out.println();
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
     public String toString() {
         return this.listVertex.toString();
     }
