@@ -246,6 +246,26 @@ public class GraphLink<E extends Comparable<E>> {
         return parentMap.get(index - 1);
     }
 
+    public boolean isConexo() throws ExceptionEmptyLinkedList {
+    if (listVertex.isEmptyList()) {
+        return true;  // Grafo vacío se considera conexo
+    }
+
+    Vertex<E> start = listVertex.getFirst().getData();  // Tomamos el primer vértice
+    LinkedList<Vertex<E>> visited = new LinkedList<>();  // Para rastrear visitados
+    dfsRecursive(start, visited);  // Recorrido DFS
+
+    // Verificar si todos los vértices están en 'visited'
+    Node<Vertex<E>> current = listVertex.getFirst();
+    while (current != null) {
+        if (visited.search(current.getData()) == -1) {
+            return false;  // Hay un vértice no visitado
+        }
+        current = current.getNext();
+    }
+    return true;
+}
+
     public String toString() {
         return this.listVertex.toString();
     }
