@@ -37,7 +37,7 @@ public class GraphLink<E extends Comparable<E>> {
         return false;
     }
 
-    // 2.2.a) Elimina un vértice del grafo
+    // Elimina un vértice del grafo
     public void removeVertex(Vertex<E> v) throws ExceptionEmptyLinkedList {
         // Primero eliminamos todas las aristas que apuntan a este vértice
         Node<Vertex<E>> current = listVertex.getFirst();
@@ -54,11 +54,11 @@ public class GraphLink<E extends Comparable<E>> {
             current = current.getNext();
         }
         
-        // Luego eliminamos el vértice y sus aristas salientes
+        // eliminamos el vértice y sus aristas salientes
         listVertex.removeNode(v);
     }
 
-    // 2.2.b) Elimina una arista entre dos vértices
+    // Elimina una arista entre dos vértices
     public void removeEdge(Vertex<E> v, Vertex<E> z) throws ExceptionEmptyLinkedList {
         if (!searchVertex(v) || !searchVertex(z)) {
             return;
@@ -82,7 +82,7 @@ public class GraphLink<E extends Comparable<E>> {
         }
     }
 
-    // 2.2.c) Recorrido en profundidad (DFS)
+    //Recorrido en profundidad (DFS)
     public void dfs(Vertex<E> start) throws ExceptionEmptyLinkedList {
         if (!searchVertex(start)) {
             System.out.println("El vértice no existe en el grafo");
@@ -107,7 +107,7 @@ public class GraphLink<E extends Comparable<E>> {
         }
     }
 
-    // Métodos adicionales
+    //metodos adicionales
     public void insertVertex(E data) {
         Vertex<E> newVertex = new Vertex<>(data);
         try {
