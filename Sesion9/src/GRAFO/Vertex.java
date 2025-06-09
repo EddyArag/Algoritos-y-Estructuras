@@ -18,7 +18,7 @@ public class Vertex<E extends Comparable<E>> implements Comparable<Vertex<E>> {
     public boolean equals(Object o) {
         if (o instanceof Vertex<?>) {
             Vertex<E> v = (Vertex<E>) o;
-            return this.data.equals(v.data);
+            return this.data.compareTo(v.data) == 0;
         }
         return false;
     }

@@ -14,12 +14,12 @@ public class GraphListEdge<E extends Comparable<E>> {
     }
 
     public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
-        Node<Vertex<E>> node = listVertex.getFirst();
-        while (node != null) {
-            if (node.getData().equals(vertex)) {
+        Node<Vertex<E>> current = listVertex.getFirst();
+        while (current != null) {
+            if (current.getData().compareTo(vertex) == 0) {
                 return true;
             }
-            node = node.getNext();
+            current = current.getNext();
         }
         return false;
     }
@@ -35,8 +35,8 @@ public class GraphListEdge<E extends Comparable<E>> {
         Node<Edge<E>> node = listEdge.getFirst();
         while (node != null) {
             Edge<E> edge = node.getData();
-            if ((edge.getRefDest().equals(v1) && node.getData().getRefDest().equals(v2)) ||
-                (edge.getRefDest().equals(v2) && node.getData().getRefDest().equals(v1))) {
+            if ((edge.getRefDest().compareTo(v1) == 0 && node.getData().getRefDest().compareTo(v2) == 0) ||
+                (edge.getRefDest().compareTo(v2) == 0 && node.getData().getRefDest().compareTo(v1) == 0)) {
                 return true;
             }
             node = node.getNext();

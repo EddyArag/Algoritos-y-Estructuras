@@ -15,7 +15,14 @@ public class GraphLink<E extends Comparable<E>> {
     }
 
     public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
-        return listVertex.search(vertex) != -1;
+        Node<Vertex<E>> current = listVertex.getFirst();
+        while (current != null) {
+            if (current.getData().compareTo(vertex) == 0) {
+                return true;
+            }
+            current = current.getNext();
+        }
+        return false;
     }
 
     public boolean searchEdge(Vertex<E> verOri, Vertex<E> verDes) throws ExceptionEmptyLinkedList {
@@ -25,11 +32,11 @@ public class GraphLink<E extends Comparable<E>> {
 
         Node<Vertex<E>> current = listVertex.getFirst();
         while (current != null) {
-            if (current.getData().equals(verOri)) {
+            if (current.getData().compareTo(verOri) == 0) {
                 LinkedList<Edge<E>> edges = current.getData().listAdj;
                 Node<Edge<E>> edgeNode = edges.getFirst();
                 while (edgeNode != null) {
-                    if (edgeNode.getData().getRefDest().equals(verDes)) {
+                    if (edgeNode.getData().getRefDest().compareTo(verDes) == 0) {
                         return true;
                     }
                     edgeNode = edgeNode.getNext();

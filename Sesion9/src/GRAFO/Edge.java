@@ -20,7 +20,7 @@ public class Edge<E extends Comparable<E>> implements Comparable<Edge<E>> {
     public boolean equals(Object o) {
         if (o instanceof Edge<?>) {
             Edge<E> e = (Edge<E>) o;
-            return this.refDest.equals(e.refDest);
+            return this.refDest.compareTo(e.refDest) == 0;
         }
         return false;
     }
