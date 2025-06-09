@@ -3,12 +3,10 @@ package Sesion9.src.LISTA;
 public class LinkedList<T extends Comparable<T>> {
     private Node<T> first;
 
-    // Constructor de la clase Lista
     public LinkedList() {
         this.first = null;
     }
 
-    // Setters y getters de first
     public void setFirst(Node<T> first) {
         this.first = first;
     }
@@ -17,12 +15,10 @@ public class LinkedList<T extends Comparable<T>> {
         return first;
     }
 
-    // Método para verificar si la lista está vacía
     public boolean isEmptyList() {
         return first == null;
     }
 
-    // Método para agregar un elemento al inicio de la lista
     public void addFirst(T data) {
         Node<T> newNode = new Node<>(data);
         if (isEmptyList()) {
@@ -33,7 +29,6 @@ public class LinkedList<T extends Comparable<T>> {
         }
     }
 
-    // Método para agregar un elemento al final de la lista
     public void addLast(T data) {
         Node<T> newNode = new Node<>(data);
         if (isEmptyList()) {
@@ -47,7 +42,6 @@ public class LinkedList<T extends Comparable<T>> {
         }
     }
 
-    // Método para eliminar un elemento de la lista
     public void removeNode(T data) throws ExceptionEmptyLinkedList {
         if (isEmptyList()) {
             throw new ExceptionEmptyLinkedList("La lista está vacía.");
@@ -66,7 +60,6 @@ public class LinkedList<T extends Comparable<T>> {
         }
     }
 
-    // Método para obtener la posición de un elemento en la lista
     public int search(T data) throws ExceptionEmptyLinkedList {
         if (isEmptyList()) {
             throw new ExceptionEmptyLinkedList("La lista está vacía.");
@@ -83,7 +76,6 @@ public class LinkedList<T extends Comparable<T>> {
         return -1;
     }
 
-    // Método para obtener el tamaño de la lista
     public int length() {
         if (isEmptyList()) {
             return 0;
@@ -97,8 +89,52 @@ public class LinkedList<T extends Comparable<T>> {
         return count;
     }
 
-    // Método para destruir la lista
+    public T get(int index) throws ExceptionEmptyLinkedList {
+        if (isEmptyList()) {
+            throw new ExceptionEmptyLinkedList("La lista está vacía.");
+        }
+        if (index < 0 || index >= length()) {
+            throw new IndexOutOfBoundsException("Índice fuera de rango");
+        }
+        Node<T> current = first;
+        for (int i = 0; i < index; i++) {
+            current = current.getNext();
+        }
+        return current.getData();
+    }
+
+    public void set(int index, T data) throws ExceptionEmptyLinkedList {
+        if (isEmptyList()) {
+            throw new ExceptionEmptyLinkedList("La lista está vacía.");
+        }
+        if (index < 0 || index >= length()) {
+            throw new IndexOutOfBoundsException("Índice fuera de rango");
+        }
+        Node<T> current = first;
+        for (int i = 0; i < index; i++) {
+            current = current.getNext();
+        }
+        current.setData(data);
+    }
+
     public void destroyList() {
         first = null;
+    }
+
+    public String toString() {
+        if (isEmptyList()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder("[");
+        Node<T> current = first;
+        while (current != null) {
+            sb.append(current.getData());
+            if (current.getNext() != null) {
+                sb.append(", ");
+            }
+            current = current.getNext();
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

@@ -2,39 +2,21 @@ package Sesion9.src.GRAFO;
 
 import Sesion9.src.LISTA.LinkedList;
 import Sesion9.src.LISTA.ExceptionEmptyLinkedList;
+import Sesion9.src.LISTA.Node;
 
-public class GraphListEdge<V, E> {
-    private LinkedList<VertexObj<V, E>> secVertex;
-    private LinkedList<EdgeObj<V, E>> secEdge;
+public class GraphListEdge<E extends Comparable<E>> {
+    private LinkedList<Vertex<E>> listVertex;
+    private LinkedList<Edge<E>> listEdge;
 
     public GraphListEdge() {
-        this.secVertex = new LinkedList<>();
-        this.secEdge = new LinkedList<>();
+        this.listVertex = new LinkedList<>();
+        this.listEdge = new LinkedList<>();
     }
 
-    public boolean searchVertex(V v) {
-        var node = secVertex.getFirst();
+    public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
+        Node<Vertex<E>> node = listVertex.getFirst();
         while (node != null) {
-            if (node.getData().info.equals(v)) return true;
-            node = node.getNext();
-        }
-        return false;
-    }
-
-    public void insertVertex(V v) {
-        if (!searchVertex(v)) {
-            int pos = secVertex.length();
-            secVertex.addLast(new VertexObj<>(v, pos));
-        }
-    }
-
-    public boolean searchEdge(V v, V z) {
-        var node = secEdge.getFirst();
-        while (node != null) {
-            EdgeObj<V, E> edge = node.getData();
-            V v1 = edge.getEndVertex1().info;
-            V v2 = edge.getEndVertex2().info;
-            if ((v1.equals(v) && v2.equals(z)) || (v1.equals(z) && v2.equals(v))) {
+            if (node.getData().equals(vertex)) {
                 return true;
             }
             node = node.getNext();
@@ -42,58 +24,91 @@ public class GraphListEdge<V, E> {
         return false;
     }
 
-    public void insertEdge(V v, V z) {
-        if (searchEdge(v, z)) return;
-
-        insertVertex(v);
-        insertVertex(z);
-
-        VertexObj<V, E> v1 = getVertexObj(v);
-        VertexObj<V, E> v2 = getVertexObj(z);
-        int pos = secEdge.length();
-        secEdge.addLast(new EdgeObj<>(v1, v2, null, pos));
+    public void insertVertex(E data) throws ExceptionEmptyLinkedList {
+        Vertex<E> newVertex = new Vertex<>(data);
+        if (!searchVertex(newVertex)) {
+            listVertex.addLast(newVertex);
+        }
     }
 
-    private VertexObj<V, E> getVertexObj(V data) {
-        var node = secVertex.getFirst();
+    public boolean searchEdge(Vertex<E> v1, Vertex<E> v2) throws ExceptionEmptyLinkedList {
+        Node<Edge<E>> node = listEdge.getFirst();
         while (node != null) {
-            if (node.getData().info.equals(data)) return node.getData();
+            Edge<E> edge = node.getData();
+            if ((edge.getRefDest().equals(v1) && node.getData().getRefDest().equals(v2)) ||
+                (edge.getRefDest().equals(v2) && node.getData().getRefDest().equals(v1))) {
+                return true;
+            }
+            node = node.getNext();
+        }
+        return false;
+    }
+
+    public void insertEdge(E data1, E data2, int weight) throws ExceptionEmptyLinkedList {
+        Vertex<E> v1 = getVertex(data1);
+        Vertex<E> v2 = getVertex(data2);
+        
+        if (v1 == null || v2 == null) {
+            System.out.println("Uno o ambos vértices no existen");
+            return;
+        }
+        
+        if (!searchEdge(v1, v2)) {
+            Edge<E> newEdge1 = new Edge<>(v2, weight);
+            Edge<E> newEdge2 = new Edge<>(v1, weight);
+            v1.listAdj.addLast(newEdge1);
+            v2.listAdj.addLast(newEdge2);
+            listEdge.addLast(newEdge1);
+        }
+    }
+
+    private Vertex<E> getVertex(E data) throws ExceptionEmptyLinkedList {
+        Node<Vertex<E>> node = listVertex.getFirst();
+        while (node != null) {
+            if (node.getData().getData().equals(data)) {
+                return node.getData();
+            }
             node = node.getNext();
         }
         return null;
     }
 
-    public void bfs(V start) throws ExceptionEmptyLinkedList {
-        boolean[] visited = new boolean[secVertex.length()];
-        StackArray<VertexObj<V, E>> stack = new StackArray<>(secVertex.length());
+    public void bfs(E start) throws ExceptionEmptyLinkedList {
+        LinkedList<Vertex<E>> queue = new LinkedList<>();
+        LinkedList<Vertex<E>> visited = new LinkedList<>();
 
-        VertexObj<V, E> startVertex = getVertexObj(start);
+        Vertex<E> startVertex = getVertex(start);
         if (startVertex == null) return;
 
-        stack.push(startVertex);
-        visited[startVertex.position] = true;
+        queue.addLast(startVertex);
+        visited.addLast(startVertex);
 
-        while (!stack.isEmpty()) {
-            VertexObj<V, E> current = stack.pop();
-            System.out.println(current.info);
+        while (!queue.isEmptyList()) {
+            Vertex<E> current = queue.getFirst().getData();
+            queue.removeNode(current);
+            System.out.println(current.getData());
 
-            var edgeNode = secEdge.getFirst();
+            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
             while (edgeNode != null) {
-                EdgeObj<V, E> edge = edgeNode.getData();
-                VertexObj<V, E> neighbor = null;
-
-                if (edge.getEndVertex1().equals(current)) {
-                    neighbor = edge.getEndVertex2();
-                } else if (edge.getEndVertex2().equals(current)) {
-                    neighbor = edge.getEndVertex1();
-                }
-
-                if (neighbor != null && !visited[neighbor.position]) {
-                    stack.push(neighbor);
-                    visited[neighbor.position] = true;
+                Vertex<E> neighbor = edgeNode.getData().getRefDest();
+                if (visited.search(neighbor) == -1) {
+                    visited.addLast(neighbor);
+                    queue.addLast(neighbor);
                 }
                 edgeNode = edgeNode.getNext();
             }
         }
     }
+
+    @Override
+    public String toString() {
+    StringBuilder sb = new StringBuilder();
+    Node<Vertex<E>> node = listVertex.getFirst();
+    while (node != null) {
+        sb.append(node.getData().toString());
+        node = node.getNext();
+    }
+    return sb.toString();
+}
+
 }

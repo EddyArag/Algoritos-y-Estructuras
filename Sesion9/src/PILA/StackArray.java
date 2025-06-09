@@ -2,11 +2,11 @@ package Sesion9.src.PILA;
 
 public class StackArray<E> implements Stack<E> {
     private E[] array;
-    private int tope;  // Índice del elemento en la cima
+    private int tope;
 
     public StackArray(int n) {
-        this.array = (E[]) new Object[n];  // Crear arreglo genérico
-        this.tope = -1;  // Pila vacía inicialmente
+        this.array = (E[]) new Object[n];
+        this.tope = -1;
     }
 
     @Override
@@ -14,7 +14,7 @@ public class StackArray<E> implements Stack<E> {
         if (this.isFull()) {
             System.out.println("Pila llena");
         } else {
-            array[++tope] = x;  // Incrementa tope y añade el elemento
+            array[++tope] = x;
         }
     }
 
@@ -24,7 +24,7 @@ public class StackArray<E> implements Stack<E> {
             throw new ExceptionIsEmpty("Pila vacía");
         } else {
             E elemento = array[tope];
-            array[tope] = null;  // Limpiar referencia
+            array[tope] = null;
             tope--;
             return elemento;
         }
@@ -50,10 +50,17 @@ public class StackArray<E> implements Stack<E> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = tope; i >= 0; i--) {  // Desde la cima hasta la base
-            sb.append(array[i]).append(" ");
+        if (isEmpty()) {
+            return "[]";
         }
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i <= tope; i++) {
+            sb.append(array[i]);
+            if (i < tope) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
         return sb.toString();
     }
 }
