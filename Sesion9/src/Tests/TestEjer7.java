@@ -20,7 +20,7 @@ public class TestEjer7 {
     public static void testIdentifyGraphType_Path() {
         System.out.println("\n--- Prueba: Tipo de grafo - Camino ---");
 
-        GraphListEdge<String, Integer> graph = new GraphListEdge<>(false);
+        GraphListEdge<String, Integer> graph = new GraphListEdge<>(true); // Grafo dirigido
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertVertex("C");
@@ -35,7 +35,7 @@ public class TestEjer7 {
     public static void testIdentifyGraphType_Cycle() {
         System.out.println("\n--- Prueba: Tipo de grafo - Ciclo ---");
 
-        GraphListEdge<String, Integer> graph = new GraphListEdge<>(false);
+        GraphListEdge<String, Integer> graph = new GraphListEdge<>(true); // Grafo dirigido
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertVertex("C");
@@ -51,17 +51,26 @@ public class TestEjer7 {
     public static void testIdentifyGraphType_Wheel() {
         System.out.println("\n--- Prueba: Tipo de grafo - Rueda ---");
 
-        GraphListEdge<String, Integer> graph = new GraphListEdge<>(false);
+        GraphListEdge<String, Integer> graph = new GraphListEdge<>(true); // Grafo dirigido
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertVertex("C");
         graph.insertVertex("D");
+
+        // Aristas del ciclo
         graph.insertEdge("A", "B", 1);
         graph.insertEdge("B", "C", 2);
         graph.insertEdge("C", "A", 3);
+
+        // Aristas desde el centro hacia los vértices del ciclo
         graph.insertEdge("D", "A", 4);
         graph.insertEdge("D", "B", 5);
         graph.insertEdge("D", "C", 6);
+
+        // Aristas desde los vértices del ciclo hacia el centro
+        graph.insertEdge("A", "D", 7);
+        graph.insertEdge("B", "D", 8);
+        graph.insertEdge("C", "D", 9);
 
         String tipo = graph.identifyGraphType("A");
         System.out.println("Tipo identificado (esperado: Rueda): " + tipo);
@@ -71,13 +80,16 @@ public class TestEjer7 {
     public static void testIdentifyGraphType_Complete() {
         System.out.println("\n--- Prueba: Tipo de grafo - Completo ---");
 
-        GraphListEdge<String, Integer> graph = new GraphListEdge<>(false);
+        GraphListEdge<String, Integer> graph = new GraphListEdge<>(true); // Grafo dirigido
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertVertex("C");
         graph.insertEdge("A", "B", 1);
-        graph.insertEdge("A", "C", 2);
-        graph.insertEdge("B", "C", 3);
+        graph.insertEdge("B", "A", 2);
+        graph.insertEdge("A", "C", 3);
+        graph.insertEdge("C", "A", 4);
+        graph.insertEdge("B", "C", 5);
+        graph.insertEdge("C", "B", 6);
 
         String tipo = graph.identifyGraphType("A");
         System.out.println("Tipo identificado (esperado: Completo): " + tipo);
@@ -87,7 +99,7 @@ public class TestEjer7 {
     public static void testIdentifyGraphType_Unknown() {
         System.out.println("\n--- Prueba: Tipo de grafo - Desconocido ---");
 
-        GraphListEdge<String, Integer> graph = new GraphListEdge<>(false);
+        GraphListEdge<String, Integer> graph = new GraphListEdge<>(true); // Grafo dirigido
         graph.insertVertex("A");
         graph.insertVertex("B");
         graph.insertEdge("A", "B", 1);

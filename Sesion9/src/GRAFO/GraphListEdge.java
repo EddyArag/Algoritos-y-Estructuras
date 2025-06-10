@@ -213,111 +213,161 @@ public class GraphListEdge<V, E> {
 
     // Método auxiliar para verificar si el grafo es de tipo camino
     private boolean isPath() {
-        if (secVertex.size() <= 2)
-            return true; // Un grafo con 0, 1 o 2 vértices se considera un camino
-
-        int edgesCount = secEdge.size() / (directed ? 1 : 2); // Número de aristas (dividir por 2 si no es dirigido)
+        if (secVertex.size() < 3)
+            return false; // Minimo 3 vertices
+        int edgesCount = secEdge.size();
         if (edgesCount != secVertex.size() - 1)
-            return false; // Un camino de N vértices tiene N-1 aristas
-
-        // Verificar que cada vértice tenga grado 2, excepto los extremos que tienen
-        // grado 1
-        int verticesWithDegreeOne = 0;
+            return false;
+        int startVertices = 0;
+        int endVertices = 0;
+        int middleVertices = 0;
         for (VertexObj<V, E> vertex : secVertex) {
-            int degree = getDegree(vertex);
-            if (degree == 1) {
-                verticesWithDegreeOne++;
-            } else if (degree != 2) {
-                return false; // Si no es 1 o 2, no es un camino
+            int inDegree = getInDegree(vertex);
+            int outDegree = getOutDegree(vertex);
+            if (inDegree == 0 && outDegree == 1) {
+                startVertices++;
+            } else if (inDegree == 1 && outDegree == 0) {
+                endVertices++;
+            } else if (inDegree == 1 && outDegree == 1) {
+                middleVertices++;
+            } else {
+                return false; // Invalid path
             }
         }
-
-        return verticesWithDegreeOne == 2; // Debe haber exactamente dos vértices con grado 1
+        return startVertices == 1 && endVertices == 1 && middleVertices == secVertex.size() - 2;
     }
 
     // Método auxiliar para verificar si el grafo es de tipo ciclo
     private boolean isCycle() {
         if (secVertex.size() < 3)
-            return false; // Un ciclo necesita al menos 3 vértices
-
-        int edgesCount = secEdge.size() / (directed ? 1 : 2); // Número de aristas (dividir por 2 si no es dirigido)
+            return false;
+        int edgesCount = secEdge.size(); // No dividir por 2 en grafos dirigidos
         if (edgesCount != secVertex.size())
-            return false; // Un ciclo de N vértices tiene N aristas
-
-        // Verificar que cada vértice tenga grado 2
+            return false;
         for (VertexObj<V, E> vertex : secVertex) {
-            if (getDegree(vertex) != 2) {
-                return false; // Si algún vértice no tiene grado 2
+            int inDegree = getInDegree(vertex);
+            int outDegree = getOutDegree(vertex);
+            if (inDegree != 1 || outDegree != 1) {
+                return false; // Invalid cycle
             }
         }
-
         return true;
     }
 
-    // Método auxiliar para verificar si el grafo es de tipo rueda
+    // Método auxiliar para verificar si el grafo es de tipo rueda (wheel)
     private boolean isWheel() {
         if (secVertex.size() < 4)
-            return false; // Una rueda necesita al menos 4 vértices
+            return false;
 
-        // Encontrar un vértice central conectado a todos los demás
         VertexObj<V, E> center = null;
+
+        // Buscar un vértice que se pueda considerar como el centro de la rueda
         for (VertexObj<V, E> vertex : secVertex) {
-            if (getDegree(vertex) == secVertex.size() - 1) {
+            int inDegree = getInDegree(vertex);
+            int outDegree = getOutDegree(vertex);
+
+            // El centro debe estar conectado con todos los demás vértices
+            if (inDegree == secVertex.size() - 1 && outDegree == secVertex.size() - 1) {
                 center = vertex;
-                break;
+                break; // Se encontró un posible centro
             }
         }
 
+        // Si no se encontró un centro, no es una rueda
         if (center == null)
-            return false; // No hay vértice central
+            return false;
 
-        // Verificar que los vértices restantes formen un ciclo
+        // Verificar si los vértices restantes forman un ciclo
         ArrayList<VertexObj<V, E>> cycleVertices = new ArrayList<>(secVertex);
         cycleVertices.remove(center);
 
-        // Crear un subgrafo con solo los vértices del ciclo
-        GraphListEdge<V, E> cycleGraph = new GraphListEdge<>(directed);
-        cycleGraph.secVertex = new ArrayList<>(cycleVertices);
+        if (cycleVertices.size() != secVertex.size() - 1)
+            return false;
 
+        GraphListEdge<V, E> cycleGraph = new GraphListEdge<>(true); // Ciclo dirigido
+        cycleGraph.secVertex = new ArrayList<>(cycleVertices); // Añadir los vértices del ciclo
+        // Agregar solo las aristas que conectan los vértices del ciclo
         for (EdgeObj<V, E> edge : secEdge) {
             if (cycleVertices.contains(edge.getEndVertex1()) && cycleVertices.contains(edge.getEndVertex2())) {
-                cycleGraph.secEdge.add(edge);
+                boolean edgeExists = false;
+
+                // Evitar agregar aristas duplicadas
+                for (EdgeObj<V, E> cycleEdge : cycleGraph.secEdge) {
+                    if (cycleEdge.getEndVertex1().equals(edge.getEndVertex1())
+                            && cycleEdge.getEndVertex2().equals(edge.getEndVertex2())) {
+                        edgeExists = true;
+                        break;
+                    }
+                }
+
+                // Insertar la arista si no ha sido añadida
+                if (!edgeExists) {
+                    cycleGraph.insertEdge((V) edge.getEndVertex1().getInfo(), (V) edge.getEndVertex2().getInfo(),
+                            edge.getInfo());
+                }
             }
         }
+        if (cycleGraph.secVertex.size() < 3)
+            return false;
+        if (cycleGraph.secEdge.size() != cycleGraph.secVertex.size())
+            return false;
+        // Verificar si los vértices restantes realmente forman un ciclo
+        if (!cycleGraph.isCycle())
+            return false;
 
-        return cycleGraph.isCycle(); // Verificar si el subgrafo es un ciclo
+        return true; // Es una rueda
     }
 
     // Método auxiliar para verificar si el grafo es de tipo completo
     private boolean isComplete() {
         int n = secVertex.size();
-        int expectedEdges = n * (n - 1) / (directed ? 1 : 2); // Número de aristas en un grafo completo (dividir por 2
-                                                              // si no es dirigido)
-        int edgesCount = secEdge.size() / (directed ? 1 : 2); // Número de aristas (dividir por 2 si no es dirigido)
-
-        if (edgesCount != expectedEdges)
-            return false; // No tiene el número correcto de aristas
-
-        // Verificar que cada vértice esté conectado a todos los demás
-        for (VertexObj<V, E> vertex : secVertex) {
-            if (getDegree(vertex) != n - 1) {
-                return false; // Si algún vértice no tiene grado N-1
+        int expectedEdges = n * (n - 1); // Cada par tiene dos aristas (A->B y B->A)
+        if (secEdge.size() != expectedEdges)
+            return false;
+        for (VertexObj<V, E> v1 : secVertex) {
+            for (VertexObj<V, E> v2 : secVertex) {
+                if (v1 != v2) {
+                    if (!searchEdge(v1, v2) || !searchEdge(v2, v1)) {
+                        return false;
+                    }
+                }
             }
         }
-
         return true;
     }
 
     // Método auxiliar para obtener el grado de un vértice
-    private int getDegree(VertexObj<V, E> vertex) {
+    private int getInDegree(VertexObj<V, E> vertex) {
         int degree = 0;
         for (EdgeObj<V, E> edge : secEdge) {
-            if (edge.getEndVertex1().equals(vertex) || (!directed && edge.getEndVertex2().equals(vertex))) {
+            if (edge.getEndVertex2().equals(vertex)) {
                 degree++;
             }
         }
         return degree;
     }
+
+    private int getOutDegree(VertexObj<V, E> vertex) {
+        int degree = 0;
+        for (EdgeObj<V, E> edge : secEdge) {
+            if (edge.getEndVertex1().equals(vertex)) {
+                degree++;
+            }
+        }
+        return degree;
+    }
+    /*
+     * private int getDegree(VertexObj<V, E> vertex) {
+     * int degree = 0;
+     * for (EdgeObj<V, E> edge : secEdge) {
+     * if (edge.getEndVertex1().equals(vertex) || (!directed &&
+     * edge.getEndVertex2().equals(vertex))) {
+     * degree++;
+     * }
+     * }
+     * return degree;
+     * }
+     */
 
     // ////////////////////////////////////////////////////////////////////////
     // Ejercicio 8: Utilizando TAD Graph, GraphLink y GraphListEdge, y la
