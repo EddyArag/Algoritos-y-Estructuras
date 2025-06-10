@@ -1,4 +1,4 @@
-package Sesion9.src.GRAFO;
+package Sesion9.src.Tests;
 
 public class TestGrafo {
     public static void main(String[] args) {
