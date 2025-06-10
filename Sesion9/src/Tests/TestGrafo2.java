@@ -1,5 +1,5 @@
 package Sesion9.src.Tests;
-
+import Sesion9.src.GRAFO.GraphLink;
 import Sesion9.src.ExceptionIsEmpty;
 import Sesion9.src.LISTA.ExceptionEmptyLinkedList;
 
