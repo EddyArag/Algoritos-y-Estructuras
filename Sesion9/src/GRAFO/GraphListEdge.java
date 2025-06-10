@@ -1,6 +1,6 @@
 package Sesion9.src.GRAFO;
 
-import Sesion9.src.Cola.ExceptionIsEmpty;
+import Sesion9.src.ExceptionIsEmpty;
 import Sesion9.src.Cola.Queue;
 import Sesion9.src.Cola.QueueLink;
 
