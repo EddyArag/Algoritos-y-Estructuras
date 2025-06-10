@@ -14,72 +14,266 @@ public class GraphLink<E extends Comparable<E>> {
         listVertex = new LinkedList<>();
     }
 
-    public boolean searchVertex(Vertex<E> vertex) throws ExceptionEmptyLinkedList {
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            if (current.getData().compareTo(vertex) == 0) {
-                return true;
-            }
-            current = current.getNext();
-        }
-        return false;
-    }
-
-    public boolean searchEdge(Vertex<E> verOri, Vertex<E> verDes) throws ExceptionEmptyLinkedList {
-        if (!searchVertex(verOri) || !searchVertex(verDes)) {
-            return false;
-        }
-
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            if (current.getData().compareTo(verOri) == 0) {
-                LinkedList<Edge<E>> edges = current.getData().listAdj;
-                Node<Edge<E>> edgeNode = edges.getFirst();
-                while (edgeNode != null) {
-                    if (edgeNode.getData().getRefDest().compareTo(verDes) == 0) {
-                        return true;
-                    }
-                    edgeNode = edgeNode.getNext();
+    // Métodos de búsqueda de vértices y aristas para grafos NO DIRIGIDOS y DIRIGIDOS
+    public boolean searchVertex(E v) {
+        for (int i = 0; i < listVertex.length(); i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(v) == 0) {
+                    return true;
                 }
-                break;
+            } catch (ExceptionEmptyLinkedList e) {
+                e.printStackTrace();
             }
-            current = current.getNext();
+        }
+        return false;
+    }
+    public boolean searchEdge(E v, E z) {
+        for (int i = 0; i < listVertex.length(); i++) {
+            try {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(v) == 0) {
+                    LinkedList<Edge<E>> adjList = vertex.listAdj;
+                    for (int j = 0; j < adjList.length(); j++) {
+                        Edge<E> edge = adjList.get(j);
+                        if (edge.getRefDest().getData().compareTo(z) == 0) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (ExceptionEmptyLinkedList e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
 
+    // Métodos para insertar vértices y aristas en grafo NO DIRIGIDO
     public void insertVertex(E data) {
-        Vertex<E> newVertex = new Vertex<>(data);
-        try {
-            if (!searchVertex(newVertex)) {
-                listVertex.addLast(newVertex);
-            }
-        } catch (ExceptionEmptyLinkedList e) {
+        if (!searchVertex(data)) {
+            Vertex<E> newVertex = new Vertex<>(data);
             listVertex.addLast(newVertex);
         }
     }
+    public void insertEdge(E verOri, E verDest, int weight) {
+        Vertex<E> origin = null;
+        Vertex<E> dest = null;
 
-    public void insertEdge(E verOri, E verDes, int weight) throws ExceptionEmptyLinkedList {
-        Vertex<E> origin = new Vertex<>(verOri);
-        Vertex<E> destination = new Vertex<>(verDes);
-
-        if (!searchVertex(origin) || !searchVertex(destination)) {
-            System.out.println("Uno o ambos vértices no existen");
-            return;
-        }
-
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            if (current.getData().equals(origin)) {
-                Edge<E> newEdge = new Edge<>(destination, weight);
-                if (current.getData().listAdj.search(newEdge) == -1) {
-                    current.getData().listAdj.addLast(newEdge);
+        try {
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(verOri) == 0) {
+                    origin = vertex;
                 }
-                break;
+                if (vertex.getData().compareTo(verDest) == 0) {
+                    dest = vertex;
+                }
             }
-            current = current.getNext();
+
+            if (origin != null && dest != null) {
+                origin.listAdj.addLast(new Edge<>(dest, weight));
+                dest.listAdj.addLast(new Edge<>(origin, weight));
+            }
+        } catch (ExceptionEmptyLinkedList e) {
+            e.printStackTrace();
         }
     }
+
+    // Metodos para remover vértices y aristas en grafo NO DIRIGIDO
+    public void removeVertex(E v) {
+        try {
+            Vertex<E> toRemove = null;
+
+            // Buscar el vértice que queremos eliminar
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(v) == 0) {
+                    toRemove = vertex;
+                    break;
+                }
+            }
+
+            if (toRemove != null) {
+                // Primero eliminar todas las aristas que apuntan a este vértice
+                for (int i = 0; i < listVertex.length(); i++) {
+                    Vertex<E> vertex = listVertex.get(i);
+                    if (vertex != toRemove) { // No limpiar sus propias aristas aún
+                        for (int j = 0; j < vertex.listAdj.length(); j++) {
+                            Edge<E> edge = vertex.listAdj.get(j);
+                            if (edge.getRefDest().compareTo(toRemove) == 0) {
+                                vertex.listAdj.removeNode(edge);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Ahora sí, eliminar el vértice de la lista de vértices
+                listVertex.removeNode(toRemove);
+            }
+        } catch (ExceptionEmptyLinkedList e) {
+            e.printStackTrace();
+        }
+    }
+    public void removeEdge(E v, E z) {
+        try {
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+
+                // Si el vértice es v, eliminar arista hacia z
+                if (vertex.getData().compareTo(v) == 0) {
+                    for (int j = 0; j < vertex.listAdj.length(); j++) {
+                        Edge<E> edge = vertex.listAdj.get(j);
+                        if (edge.getRefDest().getData().compareTo(z) == 0) {
+                            vertex.listAdj.removeNode(edge);
+                            break;
+                        }
+                    }
+                }
+
+                // Si el vértice es z, eliminar arista hacia v
+                if (vertex.getData().compareTo(z) == 0) {
+                    for (int j = 0; j < vertex.listAdj.length(); j++) {
+                        Edge<E> edge = vertex.listAdj.get(j);
+                        if (edge.getRefDest().getData().compareTo(v) == 0) {
+                            vertex.listAdj.removeNode(edge);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (ExceptionEmptyLinkedList e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Métodos para insertar aristas en grafo DIRIGIDO
+    public void insertEdgeDirigido(E verOri, E verDest, int weight) {
+        Vertex<E> origin = null;
+        Vertex<E> dest = null;
+
+        try {
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(verOri) == 0) {
+                    origin = vertex;
+                }
+                if (vertex.getData().compareTo(verDest) == 0) {
+                    dest = vertex;
+                }
+            }
+
+            if (origin != null && dest != null) {
+                origin.listAdj.addLast(new Edge<>(dest, weight));
+            }
+        } catch (ExceptionEmptyLinkedList e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Métodos para remover vértices y aristas en grafo DIRIGIDO
+    public void removeVertexDirigido(E v) {
+        try {
+            Vertex<E> toRemove = null;
+
+            // Buscar el vértice que queremos eliminar
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(v) == 0) {
+                    toRemove = vertex;
+                    break;
+                }
+            }
+
+            if (toRemove != null) {
+                // Eliminar TODAS las aristas ENTRANTES hacia este vértice
+                for (int i = 0; i < listVertex.length(); i++) {
+                    Vertex<E> vertex = listVertex.get(i);
+                    if (vertex != toRemove) {
+                        for (int j = 0; j < vertex.listAdj.length(); j++) {
+                            Edge<E> edge = vertex.listAdj.get(j);
+                            if (edge.getRefDest().compareTo(toRemove) == 0) {
+                                vertex.listAdj.removeNode(edge);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                toRemove.listAdj.destroyList();
+                listVertex.removeNode(toRemove);
+            }
+        } catch (ExceptionEmptyLinkedList e) {
+            e.printStackTrace();
+        }
+    }
+    public void removeEdgeDirigido(E v, E z) {
+        try {
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+
+                // SOLO eliminar arista que va de v → z
+                if (vertex.getData().compareTo(v) == 0) {
+                    for (int j = 0; j < vertex.listAdj.length(); j++) {
+                        Edge<E> edge = vertex.listAdj.get(j);
+                        if (edge.getRefDest().getData().compareTo(z) == 0) {
+                            vertex.listAdj.removeNode(edge);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (ExceptionEmptyLinkedList e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Método para búsqueda en profundidad (dfs) en grafo NO DIRIGIDO y DIRIGIDO
+    public void dfs(E data) {
+        try {
+            Vertex<E> startVertex = null;
+            // Buscar el vértice de inicio
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(data) == 0) {
+                    startVertex = vertex;
+                    break;
+                }
+            }
+            if (startVertex == null) {
+                System.out.println("El vértice de inicio no existe.");
+                return;
+            }
+            // Inicializar pila
+            StackArray<Vertex<E>> stack = new StackArray<>(listVertex.length());
+
+            for (int i = 0; i < listVertex.length(); i++) {
+                listVertex.get(i).setVisited(false);
+            }
+
+            stack.push(startVertex);
+            System.out.print("Recorrido DFS: ");
+            while (!stack.isEmpty()) {
+                Vertex<E> current = stack.pop();
+                if (!current.isVisited()) {
+                    current.setVisited(true);
+                    System.out.print(current.getData() + " ");
+                    for (int i = 0; i < current.listAdj.length(); i++) {
+                        Edge<E> edge = current.listAdj.get(i);
+                        Vertex<E> neighbor = edge.getRefDest();
+
+                        if (!neighbor.isVisited()) {
+                            stack.push(neighbor);
+                        }
+                    }
+                }
+            }
+            System.out.println();
+        } catch (ExceptionEmptyLinkedList | ExceptionIsEmpty e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void insertEdgeWeight(E verOri, E verDes, int weight) throws ExceptionEmptyLinkedList {
         Vertex<E> origin = new Vertex<>(verOri);
@@ -416,7 +610,7 @@ public class GraphLink<E extends Comparable<E>> {
         return path;
     }
 
-    // Este método identifica el tipo de grafo según el grado de los vértices
+    // Método que identifica el tipo de grafo NO DIRIGIDO según el grado de los vértices
     public void identificarTipoGrafo() {
         int n = listVertex.length();
 
@@ -472,7 +666,7 @@ public class GraphLink<E extends Comparable<E>> {
         }
     }
 
-    // Este método muestra un grafo de 3 formas diferentes: Formal, Lista de Adyacencia, Matriz de Adyacencia
+    // Método que muestra un grafo NO DIRIGIDO de 3 formas diferentes: Formal, Lista de Adyacencia, Matriz de Adyacencia
     public void mostrarFormasGrafo() {
         int n = listVertex.length();
 
@@ -548,6 +742,162 @@ public class GraphLink<E extends Comparable<E>> {
             }
         }
     }
+
+    // Método que identifica el tipo de grafo DIRIGIDO según el grado de los vértices
+    public void identificarTipoGrafoDirigido() {
+        int n = listVertex.length();
+        int[] entrada = new int[n];
+        int[] salida = new int[n];
+
+        // Contar grados de entrada y salida
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> origen = listVertex.get(i);
+                salida[i] = origen.listAdj.length();
+                for (int j = 0; j < origen.listAdj.length(); j++) {
+                    Edge<E> e = origen.listAdj.get(j);
+                    Vertex<E> destino = e.getRefDest();
+                    int indexDestino = listVertex.search(destino);
+                    if (indexDestino != -1) {
+                        entrada[indexDestino]++;
+                    }
+                }
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        System.out.println("\n--- Grados de los nodos (Dirigido) ---");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> v = listVertex.get(i);
+                System.out.println("Nodo " + v.getData() + ": Entrada=" + entrada[i] + ", Salida=" + salida[i]);
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        // Determinar tipo
+        boolean esCamino = true;
+        boolean esCiclo = true;
+        boolean esCompleto = true;
+        boolean esRueda = false;
+
+        int cuentaCentroRueda = 0;
+        int cuentaNodosCicloRueda = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Camino
+            if (entrada[i] > 1 || salida[i] > 1) {
+                esCamino = false;
+            }
+
+            // Ciclo
+            if (entrada[i] != 1 || salida[i] != 1) {
+                esCiclo = false;
+            }
+
+            // Completo
+            if (entrada[i] != n - 1 || salida[i] != n - 1) {
+                esCompleto = false;
+            }
+
+            // Rueda
+            if (salida[i] == n - 1 && entrada[i] == 0) {
+                cuentaCentroRueda++;
+            } else if (entrada[i] == 1 && salida[i] == 1) {
+                cuentaNodosCicloRueda++;
+            }
+        }
+
+        // Condición de rueda
+        if (cuentaCentroRueda == 1 && cuentaNodosCicloRueda == n - 1) {
+            esRueda = true;
+        }
+
+        // Mostrar resultado
+        if (esCompleto) {
+            System.out.println("El grafo dirigido es COMPLETO (K" + n + ")");
+        } else if (esRueda) {
+            System.out.println("El grafo dirigido es una RUEDA (W" + n + ")");
+        } else if (esCiclo) {
+            System.out.println("El grafo dirigido es un CICLO (C" + n + ")");
+        } else if (esCamino) {
+            System.out.println("El grafo dirigido es un CAMINO (P" + n + ")");
+        } else {
+            System.out.println("El grafo dirigido no es un camino, ciclo, rueda ni completo.");
+        }
+    }
+
+    // Método que muestra un grafo DIRIGIDO de 3 formas diferentes: Formal, Lista de Adyacencia, Matriz de Adyacencia 
+    public void mostrarFormasGrafoDirigido() {
+        int n = listVertex.length();
+
+        System.out.println("\n--- Representación FORMAL (Dirigido) ---");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> v = listVertex.get(i);
+                for (int j = 0; j < v.listAdj.length(); j++) {
+                    Edge<E> e = v.listAdj.get(j);
+                    System.out.println("Arista: " + v.getData() + " → " + e.getRefDest().getData());
+                }
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        System.out.println("\n--- Lista de ADYACENCIAS (Dirigido) ---");
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> v = listVertex.get(i);
+                System.out.print(v.getData() + " --> ");
+                System.out.println(v.listAdj.toString());
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        System.out.println("\n--- MATRIZ de ADYACENCIA (Dirigido) ---");
+        int[][] matriz = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            try {
+                Vertex<E> origen = listVertex.get(i);
+                for (int j = 0; j < origen.listAdj.length(); j++) {
+                    Edge<E> e = origen.listAdj.get(j);
+                    Vertex<E> destino = e.getRefDest();
+                    int indexDest = listVertex.search(destino);
+                    if (indexDest != -1) {
+                        matriz[i][indexDest] = 1;
+                    }
+                }
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        System.out.print("   ");
+        for (int i = 0; i < n; i++) {
+            try {
+                System.out.print(listVertex.get(i).getData() + " ");
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.print("? ");
+            }
+        }
+        System.out.println();
+
+        for (int i = 0; i < n; i++) {
+            try {
+                System.out.print(listVertex.get(i).getData() + " ");
+                for (int j = 0; j < n; j++) {
+                    System.out.print(" " + matriz[i][j] + " ");
+                }
+                System.out.println();
+            } catch (ExceptionEmptyLinkedList e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
     public String toString() {
         return this.listVertex.toString();
     }

@@ -5,14 +5,21 @@ import Sesion9.src.LISTA.LinkedList;
 public class Vertex<E extends Comparable<E>> implements Comparable<Vertex<E>> {
     private E data;
     protected LinkedList<Edge<E>> listAdj;
+    private boolean visited;
 
     public Vertex(E data) {
         this.data = data;
         listAdj = new LinkedList<Edge<E>>();
+        this.visited = false;
     }
-
     public E getData() {
         return data;
+    }
+    public boolean isVisited() {
+        return visited;
+    }
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 
     public boolean equals(Object o) {
