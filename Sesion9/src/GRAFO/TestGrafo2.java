@@ -1,5 +1,6 @@
 package Sesion9.src.GRAFO;
 
+import Sesion9.src.ExceptionIsEmpty;
 import Sesion9.src.LISTA.ExceptionEmptyLinkedList;
 
 public class TestGrafo2 {
@@ -89,7 +90,7 @@ public class TestGrafo2 {
                 Vertex<E> vertex = graph.listVertex.get(i);
                 System.out.print(vertex);
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
         System.out.println();

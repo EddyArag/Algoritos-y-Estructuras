@@ -1,4 +1,6 @@
 package Sesion9.src.Cola;
+import Sesion9.src.Node;
+import Sesion9.src.ExceptionIsEmpty;
 
 public class QueueLink<E extends Comparable<E>> implements Queue<E> {
     private Node<E> first;

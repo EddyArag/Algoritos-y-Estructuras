@@ -1,4 +1,6 @@
 package Sesion9.src.LISTA;
+import Sesion9.src.ExceptionIsEmpty;
+import Sesion9.src.Node;
 
 public class LinkedList<T extends Comparable<T>> {
     private Node<T> first;
@@ -42,16 +44,16 @@ public class LinkedList<T extends Comparable<T>> {
         }
     }
 
-    public void removeNode(T data) throws ExceptionEmptyLinkedList {
+    public void removeNode(T data) throws ExceptionIsEmpty {
         if (isEmptyList()) {
-            throw new ExceptionEmptyLinkedList("La lista está vacía.");
+            throw new ExceptionIsEmpty("La lista está vacía.");
         }
-        if (first.getData().compareTo(data) == 0) {
+        if (first.getElemento().compareTo(data) == 0) {
             first = first.getNext();
         } else {
             Node<T> current = first;
             while (current.getNext() != null) {
-                if (current.getNext().getData().compareTo(data) == 0) {
+                if (current.getNext().getElemento().compareTo(data) == 0) {
                     current.setNext(current.getNext().getNext());
                     break;
                 }
@@ -60,14 +62,14 @@ public class LinkedList<T extends Comparable<T>> {
         }
     }
 
-    public int search(T data) throws ExceptionEmptyLinkedList {
+    public int search(T data) throws ExceptionIsEmpty {
         if (isEmptyList()) {
-            throw new ExceptionEmptyLinkedList("La lista está vacía.");
+            throw new ExceptionIsEmpty("La lista está vacía.");
         }
         Node<T> current = first;
         int index = 0;
         while (current != null) {
-            if (current.getData().compareTo(data) == 0) {
+            if (current.getElemento().compareTo(data) == 0) {
                 return index;
             }
             current = current.getNext();
@@ -89,9 +91,9 @@ public class LinkedList<T extends Comparable<T>> {
         return count;
     }
 
-    public T get(int index) throws ExceptionEmptyLinkedList {
+    public T get(int index) throws ExceptionIsEmpty {
         if (isEmptyList()) {
-            throw new ExceptionEmptyLinkedList("La lista está vacía.");
+            throw new ExceptionIsEmpty("La lista está vacía.");
         }
         if (index < 0 || index >= length()) {
             throw new IndexOutOfBoundsException("Índice fuera de rango");
@@ -100,12 +102,12 @@ public class LinkedList<T extends Comparable<T>> {
         for (int i = 0; i < index; i++) {
             current = current.getNext();
         }
-        return current.getData();
+        return current.getElemento();
     }
 
-    public void set(int index, T data) throws ExceptionEmptyLinkedList {
+    public void set(int index, T data) throws ExceptionIsEmpty {
         if (isEmptyList()) {
-            throw new ExceptionEmptyLinkedList("La lista está vacía.");
+            throw new ExceptionIsEmpty("La lista está vacía.");
         }
         if (index < 0 || index >= length()) {
             throw new IndexOutOfBoundsException("Índice fuera de rango");
@@ -114,7 +116,7 @@ public class LinkedList<T extends Comparable<T>> {
         for (int i = 0; i < index; i++) {
             current = current.getNext();
         }
-        current.setData(data);
+        current.setElemento(data);
     }
 
     public void destroyList() {
@@ -128,7 +130,7 @@ public class LinkedList<T extends Comparable<T>> {
         StringBuilder sb = new StringBuilder("[");
         Node<T> current = first;
         while (current != null) {
-            sb.append(current.getData());
+            sb.append(current.getElemento());
             if (current.getNext() != null) {
                 sb.append(", ");
             }

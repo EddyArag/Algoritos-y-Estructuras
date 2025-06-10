@@ -1,11 +1,14 @@
 package Sesion9.src.GRAFO;
 
-import Sesion9.src.LISTA.ExceptionEmptyLinkedList;
-import Sesion9.src.LISTA.LinkedList;
-import Sesion9.src.LISTA.Node;
-import Sesion9.src.PILA.ExceptionIsEmpty;
-import Sesion9.src.PILA.StackArray;
+import Sesion9.src.LISTA.*;
+import Sesion9.src.PILA.*;
+import Sesion9.src.Cola.*;
+import Sesion9.src.Node;
+import Sesion9.src.ExceptionIsEmpty;
+import Sesion9.src.COLAPRIORITARIA.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GraphLink<E extends Comparable<E>> {
     protected LinkedList<Vertex<E>> listVertex;
@@ -22,7 +25,7 @@ public class GraphLink<E extends Comparable<E>> {
                 if (vertex.getData().compareTo(v) == 0) {
                     return true;
                 }
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 e.printStackTrace();
             }
         }
@@ -41,7 +44,7 @@ public class GraphLink<E extends Comparable<E>> {
                         }
                     }
                 }
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 e.printStackTrace();
             }
         }
@@ -74,7 +77,7 @@ public class GraphLink<E extends Comparable<E>> {
                 origin.listAdj.addLast(new Edge<>(dest, weight));
                 dest.listAdj.addLast(new Edge<>(origin, weight));
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
@@ -111,7 +114,7 @@ public class GraphLink<E extends Comparable<E>> {
                 // Ahora sí, eliminar el vértice de la lista de vértices
                 listVertex.removeNode(toRemove);
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
@@ -142,7 +145,7 @@ public class GraphLink<E extends Comparable<E>> {
                     }
                 }
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
@@ -166,7 +169,7 @@ public class GraphLink<E extends Comparable<E>> {
             if (origin != null && dest != null) {
                 origin.listAdj.addLast(new Edge<>(dest, weight));
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
@@ -203,7 +206,7 @@ public class GraphLink<E extends Comparable<E>> {
                 toRemove.listAdj.destroyList();
                 listVertex.removeNode(toRemove);
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
@@ -223,12 +226,12 @@ public class GraphLink<E extends Comparable<E>> {
                     }
                 }
             }
-        } catch (ExceptionEmptyLinkedList e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
 
-    // Método para búsqueda en profundidad (dfs) en grafo NO DIRIGIDO y DIRIGIDO
+    // Método para recorrido en profundidad (dfs) en grafo NO DIRIGIDO y DIRIGIDO
     public void dfs(E data) {
         try {
             Vertex<E> startVertex = null;
@@ -269,165 +272,204 @@ public class GraphLink<E extends Comparable<E>> {
                 }
             }
             System.out.println();
-        } catch (ExceptionEmptyLinkedList | ExceptionIsEmpty e) {
+        } catch (ExceptionIsEmpty e) {
             e.printStackTrace();
         }
     }
 
-
-    public void insertEdgeWeight(E verOri, E verDes, int weight) throws ExceptionEmptyLinkedList {
-        Vertex<E> origin = new Vertex<>(verOri);
-        Vertex<E> destination = new Vertex<>(verDes);
-
-        if (!searchVertex(origin) || !searchVertex(destination)) {
-            System.out.println("Uno o ambos vértices no existen");
-            return;
-        }
-
-        insertDirectedEdge(origin, destination, weight);
-        insertDirectedEdge(destination, origin, weight);
-    }
-
-    private void insertDirectedEdge(Vertex<E> from, Vertex<E> to, int weight) throws ExceptionEmptyLinkedList {
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            if (current.getData().equals(from)) {
-                Edge<E> newEdge = new Edge<>(to, weight);
-                if (current.getData().listAdj.search(newEdge) == -1) {
-                    current.getData().listAdj.addLast(newEdge);
+    // Método para recorrido en anchura (bfs) en grafo NO DIRIGIDO y DIRIGIDO
+    public void bfs(E data) {
+        try {
+            Vertex<E> startVertex = null;
+            // Buscar el vértice de inicio
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(data) == 0) {
+                    startVertex = vertex;
+                    break;
                 }
-                break;
             }
-            current = current.getNext();
-        }
-    }
+            if (startVertex == null) {
+                System.out.println("El vértice de inicio no existe.");
+                return;
+            }
 
-    public ArrayList<Vertex<E>> shortPath(Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
-        if (!searchVertex(start) || !searchVertex(end)) {
-            return new ArrayList<>();
-        }
-
-        LinkedList<Vertex<E>> vertices = getAllVertices();
-        LinkedList<Integer> distances = new LinkedList<>();
-        LinkedList<Vertex<E>> predecessors = new LinkedList<>();
-        LinkedList<Vertex<E>> unvisited = new LinkedList<>();
-
-        Node<Vertex<E>> current = vertices.getFirst();
-        while (current != null) {
-            distances.addLast(Integer.MAX_VALUE);
-            predecessors.addLast(null);
-            unvisited.addLast(current.getData());
-            current = current.getNext();
-        }
-        setDistance(distances, vertices, start, 0);
-
-        while (!unvisited.isEmptyList()) {
-            Vertex<E> u = getVertexWithMinDistance(unvisited, distances, vertices);
-            unvisited.removeNode(u);
-
-            Node<Edge<E>> edgeNode = getVertexNode(u).getData().listAdj.getFirst();
-            while (edgeNode != null) {
-                Vertex<E> neighbor = edgeNode.getData().getRefDest();
-                int alt = getDistance(distances, vertices, u) + edgeNode.getData().getWeight();
-                if (alt < getDistance(distances, vertices, neighbor)) {
-                    setDistance(distances, vertices, neighbor, alt);
-                    setPredecessor(predecessors, vertices, neighbor, u);
+            // Inicializar la cola
+            QueueLink<Vertex<E>> queue = new QueueLink<>();
+            for (int i = 0; i < listVertex.length(); i++) {
+                listVertex.get(i).setVisited(false);
+            }
+            queue.enqueue(startVertex);
+            startVertex.setVisited(true);
+            System.out.print("Recorrido BFS: ");
+            while (!queue.isEmpty()) {
+                Vertex<E> current = queue.dequeue();
+                System.out.print(current.getData() + " ");
+                for (int i = 0; i < current.listAdj.length(); i++) {
+                    Edge<E> edge = current.listAdj.get(i);
+                    Vertex<E> neighbor = edge.getRefDest();
+                    if (!neighbor.isVisited()) {
+                        queue.enqueue(neighbor);
+                        neighbor.setVisited(true);
+                    }
                 }
-                edgeNode = edgeNode.getNext();
             }
-        }
-
-        return reconstructPath(predecessors, vertices, start, end);
-    }
-
-    private LinkedList<Vertex<E>> getAllVertices() throws ExceptionEmptyLinkedList {
-        LinkedList<Vertex<E>> vertices = new LinkedList<>();
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            vertices.addLast(current.getData());
-            current = current.getNext();
-        }
-        return vertices;
-    }
-
-    private int getDistance(LinkedList<Integer> distances, LinkedList<Vertex<E>> vertices, Vertex<E> v) throws ExceptionEmptyLinkedList {
-        int index = vertices.search(v);
-        return index != -1 ? distances.get(index) : Integer.MAX_VALUE;
-    }
-
-    private void setDistance(LinkedList<Integer> distances, LinkedList<Vertex<E>> vertices, Vertex<E> v, int value) throws ExceptionEmptyLinkedList {
-        int index = vertices.search(v);
-        if (index != -1) {
-            distances.set(index, value);
+            System.out.println();
+        } catch (ExceptionIsEmpty e) {
+            e.printStackTrace();
         }
     }
 
-    private void setPredecessor(LinkedList<Vertex<E>> predecessors, LinkedList<Vertex<E>> vertices, Vertex<E> v, Vertex<E> pred) throws ExceptionEmptyLinkedList {
-        int index = vertices.search(v);
-        if (index != -1) {
-            predecessors.set(index, pred);
-        }
-    }
-
-    private Vertex<E> getVertexWithMinDistance(LinkedList<Vertex<E>> unvisited, LinkedList<Integer> distances, LinkedList<Vertex<E>> vertices) throws ExceptionEmptyLinkedList {
-        Vertex<E> minVertex = null;
-        int minDistance = Integer.MAX_VALUE;
-        
-        Node<Vertex<E>> current = unvisited.getFirst();
-        while (current != null) {
-            int currentDist = getDistance(distances, vertices, current.getData());
-            if (currentDist < minDistance) {
-                minDistance = currentDist;
-                minVertex = current.getData();
+    // Método para recorrido en anchura (bfs) con el camino de vértices que se recorrió
+    public ArrayList<E> bfsPath(E verOri, E verDest) {
+        ArrayList<E> path = new ArrayList<>();
+        try {
+            Vertex<E> startVertex = null;
+            Vertex<E> endVertex = null;
+            // Buscar los vértices de inicio y fin
+            for (int i = 0; i < listVertex.length(); i++) {
+                Vertex<E> vertex = listVertex.get(i);
+                if (vertex.getData().compareTo(verOri) == 0) {
+                    startVertex = vertex;
+                }
+                if (vertex.getData().compareTo(verDest) == 0) {
+                    endVertex = vertex;
+                }
             }
-            current = current.getNext();
-        }
-        return minVertex;
-    }
+            if (startVertex == null || endVertex == null) {
+                System.out.println("Uno o ambos vértices no existen.");
+                return path;
+            }
+            // Inicializar la cola
+            QueueLink<Vertex<E>> queue = new QueueLink<>();
+            // Listas paralelas: vértices y sus respectivos padres
+            LinkedList<Vertex<E>> verticesList = new LinkedList<>();
+            LinkedList<Vertex<E>> parentList = new LinkedList<>();
+            // Marcar todos los vértices como no visitados
+            for (int i = 0; i < listVertex.length(); i++) {
+                listVertex.get(i).setVisited(false);
+            }
+            queue.enqueue(startVertex);
+            startVertex.setVisited(true);
 
-    private ArrayList<Vertex<E>> reconstructPath(LinkedList<Vertex<E>> predecessors, LinkedList<Vertex<E>> vertices, Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
-        ArrayList<Vertex<E>> path = new ArrayList<>();
-        Vertex<E> step = end;
-        
-        if (getPredecessor(predecessors, vertices, end) == null && !end.equals(start)) {
-            return path;
-        }
-        
-        while (step != null) {
-            path.add(0, step);
-            step = getPredecessor(predecessors, vertices, step);
+            verticesList.addLast(startVertex);
+            parentList.addLast(null);
+
+            boolean found = false;
+            while (!queue.isEmpty() && !found) {
+                Vertex<E> current = queue.dequeue();
+                if (current.getData().compareTo(verDest) == 0) {
+                    found = true;
+                    break;
+                }
+                for (int i = 0; i < current.listAdj.length(); i++) {
+                    Edge<E> edge = current.listAdj.get(i);
+                    Vertex<E> neighbor = edge.getRefDest();
+                    if (!neighbor.isVisited()) {
+                        queue.enqueue(neighbor);
+                        neighbor.setVisited(true);
+                        verticesList.addLast(neighbor);
+                        parentList.addLast(current);
+                    }
+                }
+            }
+            // Reconstrucción del camino
+            if (found) {
+                LinkedList<E> reversePath = new LinkedList<>();
+                Vertex<E> current = endVertex;
+                while (current != null) {
+                    reversePath.addFirst(current.getData());
+                    int index = verticesList.search(current);
+                    if (index != -1) {
+                        current = parentList.get(index);
+                    } else {
+                        current = null;
+                    }
+                }
+                Node<E> node = reversePath.getFirst();
+                while (node != null) {
+                    path.add(node.getElemento());
+                    node = node.getNext();
+                }
+            } else {
+                System.out.println("No existe un camino entre " + verOri + " y " + verDest);
+            }
+        } catch (ExceptionIsEmpty e) {
+            e.printStackTrace();
         }
         return path;
     }
 
-    private Vertex<E> getPredecessor(LinkedList<Vertex<E>> predecessors, LinkedList<Vertex<E>> vertices, Vertex<E> v) throws ExceptionEmptyLinkedList {
-        int index = vertices.search(v);
-        return index != -1 ? predecessors.get(index) : null;
-    }
+    // Método que encuentra la ruta más corta entre dos vértices
+    public ArrayList<Vertex<E>> shortPath(Vertex<E> source, Vertex<E> destination) throws ExceptionIsEmpty {
+        // Distancias mínimas desde el origen
+        Map<Vertex<E>, Integer> distances = new HashMap<>();
+        // Predecesores para reconstruir el camino
+        Map<Vertex<E>, Vertex<E>> predecessors = new HashMap<>();
+        // Cola de prioridad basada en distancia
+        PriorityQueueLinkSort<Vertex<E>, Integer> pq = new PriorityQueueLinkSort<>();
 
-    private Node<Vertex<E>> getVertexNode(Vertex<E> v) throws ExceptionEmptyLinkedList {
+        // Inicializar todos los vértices con distancia infinita
         Node<Vertex<E>> current = listVertex.getFirst();
         while (current != null) {
-            if (current.getData().equals(v)) {
-                return current;
-            }
+            Vertex<E> vertex = current.getElemento();
+            distances.put(vertex, Integer.MAX_VALUE);
+            vertex.setVisited(false);
             current = current.getNext();
         }
-        return null;
+        // Distancia del origen es 0
+        distances.put(source, 0);
+        pq.enqueue(source, 0);
+        while (!pq.isEmpty()) {
+            Vertex<E> u = pq.dequeue();
+            if (u.isVisited()) continue;
+            u.setVisited(true);
+
+            Node<Edge<E>> edgeNode = u.listAdj.getFirst();
+            while (edgeNode != null) {
+                Edge<E> edge = edgeNode.getElemento();
+                Vertex<E> neighbor = edge.getRefDest();
+                int weight = edge.getWeight();
+                int alt = distances.get(u) + weight;
+
+                if (alt < distances.get(neighbor)) {
+                    distances.put(neighbor, alt);
+                    predecessors.put(neighbor, u);
+                    pq.enqueue(neighbor, alt);
+                }
+
+                edgeNode = edgeNode.getNext();
+            }
+        }
+
+        // Reconstruir el camino desde destino a origen
+        ArrayList<Vertex<E>> path = new ArrayList<>();
+        Vertex<E> step = destination;
+
+        if (!predecessors.containsKey(step) && !step.equals(source)) {
+            return path; // No hay camino
+        }
+
+        while (step != null) {
+            path.add(0, step); // Insertar al inicio
+            step = predecessors.get(step);
+        }
+
+        return path;
     }
 
+    // Método para corroborar que un grafo es conexo
     public boolean isConexo() throws ExceptionEmptyLinkedList {
         if (listVertex.isEmptyList()) {
             return true;
         }
+        Vertex<E> startVertex = listVertex.getFirst().getElemento();
+        bfs(startVertex.getData());
 
-        Vertex<E> start = listVertex.getFirst().getData();
-        LinkedList<Vertex<E>> visited = new LinkedList<>();
-        bfs(start, visited);
-
+        // Verificamos si todos los vértices fueron visitados
         Node<Vertex<E>> current = listVertex.getFirst();
         while (current != null) {
-            if (visited.search(current.getData()) == -1) {
+            if (!current.getElemento().isVisited()) {
                 return false;
             }
             current = current.getNext();
@@ -435,179 +477,68 @@ public class GraphLink<E extends Comparable<E>> {
         return true;
     }
 
-    private void bfs(Vertex<E> start, LinkedList<Vertex<E>> visited) throws ExceptionEmptyLinkedList {
-        LinkedList<Vertex<E>> queue = new LinkedList<>();
-        queue.addLast(start);
-        visited.addLast(start);
+    // Método de Dijkstra para hallar el menor recorrido de un vértice a otro
+    public StackArray<E> dijkstra(E v, E w) throws ExceptionEmptyLinkedList, ExceptionIsEmpty {
+        // Paso 1: Inicializar estructuras
+        HashMap<Vertex<E>, Integer> distancias = new HashMap<>();
+        HashMap<Vertex<E>, Vertex<E>> predecesores = new HashMap<>();
+        PriorityQueueLinkSort<Vertex<E>, Integer> pq = new PriorityQueueLinkSort<>();
 
-        while (!queue.isEmptyList()) {
-            Vertex<E> current = queue.getFirst().getData();
-            queue.removeNode(current);
+        // Inicializar todas las distancias a infinito (usaremos Integer.MAX_VALUE)
+        for (int i = 0; i < listVertex.length(); i++) {
+            Vertex<E> vertex = listVertex.get(i);
+            distancias.put(vertex, Integer.MAX_VALUE);
+            predecesores.put(vertex, null);
+        }
 
-            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
-            while (edgeNode != null) {
-                Vertex<E> neighbor = edgeNode.getData().getRefDest();
-                if (visited.search(neighbor) == -1) {
-                    visited.addLast(neighbor);
-                    queue.addLast(neighbor);
+        // Encontrar vértice de inicio y de destino
+        Vertex<E> startVertex = null;
+        Vertex<E> endVertex = null;
+        for (int i = 0; i < listVertex.length(); i++) {
+            Vertex<E> vertex = listVertex.get(i);
+            if (vertex.getData().compareTo(v) == 0) {
+                startVertex = vertex;
+            }
+            if (vertex.getData().compareTo(w) == 0) {
+                endVertex = vertex;
+            }
+        }
+        if (startVertex == null || endVertex == null) {
+            System.out.println("Alguno de los vértices no existe.");
+            return new StackArray<>(listVertex.length());
+        }
+
+        // Inicializamos distancia del vértice de inicio a 0
+        distancias.put(startVertex, 0);
+        pq.enqueue(startVertex, 0);
+
+        // Paso 2: Algoritmo de Dijkstra
+        while (!pq.isEmpty()) {
+            Vertex<E> current = pq.dequeue();
+            for (int i = 0; i < current.listAdj.length(); i++) {
+                Edge<E> edge = current.listAdj.get(i);
+                Vertex<E> neighbor = edge.getRefDest();
+                int nuevaDist = distancias.get(current) + edge.getWeight();
+                if (nuevaDist < distancias.get(neighbor)) {
+                    distancias.put(neighbor, nuevaDist);
+                    predecesores.put(neighbor, current);
+                    pq.enqueue(neighbor, nuevaDist);
                 }
-                edgeNode = edgeNode.getNext();
-            }
-        }
-    }
-
-    public StackArray<Vertex<E>> Dijsktra(Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
-        ArrayList<Vertex<E>> path = shortPath(start, end);
-        StackArray<Vertex<E>> stack = new StackArray<>(path.size());
-        
-        for (int i = path.size() - 1; i >= 0; i--) {
-            stack.push(path.get(i));
-        }
-        return stack;
-    }
-
-    public void removeVertex(Vertex<E> v) throws ExceptionEmptyLinkedList {
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            Vertex<E> vertex = current.getData();
-            Node<Edge<E>> edgeNode = vertex.listAdj.getFirst();
-            while (edgeNode != null) {
-                if (edgeNode.getData().getRefDest().equals(v)) {
-                    vertex.listAdj.removeNode(edgeNode.getData());
-                    break;
-                }
-                edgeNode = edgeNode.getNext();
-            }
-            current = current.getNext();
-        }
-        listVertex.removeNode(v);
-    }
-
-    public void removeEdge(Vertex<E> v, Vertex<E> z) throws ExceptionEmptyLinkedList {
-        if (!searchVertex(v) || !searchVertex(z)) {
-            return;
-        }
-
-        Node<Vertex<E>> current = listVertex.getFirst();
-        while (current != null) {
-            if (current.getData().equals(v)) {
-                LinkedList<Edge<E>> edges = current.getData().listAdj;
-                Node<Edge<E>> edgeNode = edges.getFirst();
-                while (edgeNode != null) {
-                    if (edgeNode.getData().getRefDest().equals(z)) {
-                        edges.removeNode(edgeNode.getData());
-                        return;
-                    }
-                    edgeNode = edgeNode.getNext();
-                }
-                break;
-            }
-            current = current.getNext();
-        }
-    }
-
-    public void dfs(Vertex<E> start) throws ExceptionEmptyLinkedList {
-        if (!searchVertex(start)) {
-            System.out.println("El vértice no existe en el grafo");
-            return;
-        }
-
-        LinkedList<Vertex<E>> visited = new LinkedList<>();
-        dfsRecursive(start, visited);
-    }
-
-    private void dfsRecursive(Vertex<E> current, LinkedList<Vertex<E>> visited) throws ExceptionEmptyLinkedList {
-        System.out.println("Visitando: " + current.getData());
-        visited.addLast(current);
-
-        Node<Edge<E>> edgeNode = current.listAdj.getFirst();
-        while (edgeNode != null) {
-            Vertex<E> neighbor = edgeNode.getData().getRefDest();
-            if (visited.search(neighbor) == -1) {
-                dfsRecursive(neighbor, visited);
-            }
-            edgeNode = edgeNode.getNext();
-        }
-    }
-
-    public void bfs(Vertex<E> start) throws ExceptionEmptyLinkedList {
-        if (!searchVertex(start)) {
-            System.out.println("El vértice no existe en el grafo.");
-            return;
-        }
-
-        LinkedList<Vertex<E>> queue = new LinkedList<>();
-        LinkedList<Vertex<E>> visited = new LinkedList<>();
-
-        queue.addLast(start);
-        visited.addLast(start);
-
-        while (!queue.isEmptyList()) {
-            Vertex<E> current = queue.getFirst().getData();
-            queue.removeNode(current);
-            System.out.println("Visitando: " + current.getData());
-
-            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
-            while (edgeNode != null) {
-                Vertex<E> neighbor = edgeNode.getData().getRefDest();
-                if (visited.search(neighbor) == -1) {
-                    visited.addLast(neighbor);
-                    queue.addLast(neighbor);
-                }
-                edgeNode = edgeNode.getNext();
-            }
-        }
-    }
-
-    public ArrayList<Vertex<E>> bfsPath(Vertex<E> start, Vertex<E> end) throws ExceptionEmptyLinkedList {
-        ArrayList<Vertex<E>> path = new ArrayList<>();
-        if (!searchVertex(start) || !searchVertex(end)) {
-            return path;
-        }
-
-        LinkedList<Vertex<E>> queue = new LinkedList<>();
-        LinkedList<Vertex<E>> visited = new LinkedList<>();
-        LinkedList<Vertex<E>> parents = new LinkedList<>();
-
-        queue.addLast(start);
-        visited.addLast(start);
-        parents.addLast(null);
-
-        boolean found = false;
-        int endIndex = -1;
-
-        while (!queue.isEmptyList() && !found) {
-            Vertex<E> current = queue.getFirst().getData();
-            queue.removeNode(current);
-
-            if (current.equals(end)) {
-                found = true;
-                endIndex = visited.search(current);
-                break;
-            }
-
-            Node<Edge<E>> edgeNode = current.listAdj.getFirst();
-            while (edgeNode != null) {
-                Vertex<E> neighbor = edgeNode.getData().getRefDest();
-                if (visited.search(neighbor) == -1) {
-                    visited.addLast(neighbor);
-                    queue.addLast(neighbor);
-                    parents.addLast(current);
-                }
-                edgeNode = edgeNode.getNext();
             }
         }
 
-        if (found) {
-            Vertex<E> node = end;
-            while (node != null) {
-                path.add(0, node);
-                int nodeIndex = visited.search(node);
-                node = parents.get(nodeIndex);
-            }
+        // Paso 3: Reconstruir la ruta más corta (de w hacia v)
+        StackArray<E> ruta = new StackArray<>(listVertex.length());
+        Vertex<E> step = endVertex;
+        if (predecesores.get(step) == null && step != startVertex) {
+            System.out.println("No existe ruta entre los vértices.");
+            return ruta;
         }
-
-        return path;
+        while (step != null) {
+            ruta.push(step.getData());
+            step = predecesores.get(step);
+        }
+        return ruta;
     }
 
     // Método que identifica el tipo de grafo NO DIRIGIDO según el grado de los vértices
@@ -621,7 +552,7 @@ public class GraphLink<E extends Comparable<E>> {
                 Vertex<E> vertex = listVertex.get(i);
                 int grado = vertex.listAdj.length();
                 System.out.println("Nodo " + vertex.getData() + ": G" + grado);
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -647,7 +578,7 @@ public class GraphLink<E extends Comparable<E>> {
                     countGradoN_1++;
                 }
 
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -681,7 +612,7 @@ public class GraphLink<E extends Comparable<E>> {
                     System.out.print(edge.getRefDest().getData() + " ");
                 }
                 System.out.println();
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -693,7 +624,7 @@ public class GraphLink<E extends Comparable<E>> {
                 Vertex<E> vertex = listVertex.get(i);
                 System.out.print(vertex.getData() + " --> ");
                 System.out.println(vertex.listAdj.toString());
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -712,7 +643,7 @@ public class GraphLink<E extends Comparable<E>> {
                         matriz[i][indexDest] = 1;
                     }
                 }
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -723,7 +654,7 @@ public class GraphLink<E extends Comparable<E>> {
             try {
                 Vertex<E> vertex = listVertex.get(i);
                 System.out.print(vertex.getData() + " ");
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.print("? ");
             }
         }
@@ -737,7 +668,7 @@ public class GraphLink<E extends Comparable<E>> {
                     System.out.print(" " + matriz[i][j] + " ");
                 }
                 System.out.println();
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -762,7 +693,7 @@ public class GraphLink<E extends Comparable<E>> {
                         entrada[indexDestino]++;
                     }
                 }
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -772,7 +703,7 @@ public class GraphLink<E extends Comparable<E>> {
             try {
                 Vertex<E> v = listVertex.get(i);
                 System.out.println("Nodo " + v.getData() + ": Entrada=" + entrada[i] + ", Salida=" + salida[i]);
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -841,7 +772,7 @@ public class GraphLink<E extends Comparable<E>> {
                     Edge<E> e = v.listAdj.get(j);
                     System.out.println("Arista: " + v.getData() + " → " + e.getRefDest().getData());
                 }
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -852,7 +783,7 @@ public class GraphLink<E extends Comparable<E>> {
                 Vertex<E> v = listVertex.get(i);
                 System.out.print(v.getData() + " --> ");
                 System.out.println(v.listAdj.toString());
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -870,7 +801,7 @@ public class GraphLink<E extends Comparable<E>> {
                         matriz[i][indexDest] = 1;
                     }
                 }
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
@@ -879,7 +810,7 @@ public class GraphLink<E extends Comparable<E>> {
         for (int i = 0; i < n; i++) {
             try {
                 System.out.print(listVertex.get(i).getData() + " ");
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.print("? ");
             }
         }
@@ -892,7 +823,7 @@ public class GraphLink<E extends Comparable<E>> {
                     System.out.print(" " + matriz[i][j] + " ");
                 }
                 System.out.println();
-            } catch (ExceptionEmptyLinkedList e) {
+            } catch (ExceptionIsEmpty e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }

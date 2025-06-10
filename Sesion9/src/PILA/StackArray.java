@@ -1,4 +1,5 @@
 package Sesion9.src.PILA;
+import Sesion9.src.ExceptionIsEmpty;
 
 public class StackArray<E> implements Stack<E> {
     private E[] array;

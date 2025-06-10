@@ -1,4 +1,4 @@
-package Sesion9.src.Cola;
+package Sesion9.src;
 
 public class Node<E extends Comparable<E>> implements Comparable<E> {
     private E elemento;
