@@ -1,6 +1,6 @@
 package Sesion9.src.GRAFO;
 
-public class VertexObj<V, E> {
+public class VertexObj<V, E> implements Comparable<VertexObj<V, E>> {
     protected V info;
     protected int position;
 
@@ -27,5 +27,18 @@ public class VertexObj<V, E> {
 
     public String toString() {
         return info.toString();
+    }
+
+    @Override
+    public int compareTo(VertexObj<V, E> other) {
+        // Implementa la lógica de comparación aquí.
+        // Por ejemplo, comparar por posición:
+        return Integer.compare(this.position, other.position);
+        // O comparar por info (si V implementa Comparable):
+        // if (info instanceof Comparable && other.info instanceof Comparable) {
+        // return ((Comparable) info).compareTo(other.info);
+        // } else {
+        // return 0; // O alguna otra lógica si info no es comparable
+        // }
     }
 }
