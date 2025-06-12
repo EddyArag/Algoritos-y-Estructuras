@@ -193,6 +193,59 @@ public class GraphListEdge<V, E> {
         }
     }
 
+    // Método para eliminar una arista
+    public void removeEdge(V v, V z) {
+        // Buscar los objetos VertexObj correspondientes a v y z
+        VertexObj<V, E> vertexV = null;
+        VertexObj<V, E> vertexZ = null;
+        for (VertexObj<V, E> vertex : secVertex) {
+            if (vertex.getInfo().equals(v)) {
+                vertexV = vertex;
+            }
+            if (vertex.getInfo().equals(z)) {
+                vertexZ = vertex;
+            }
+        }
+
+        // Si alguno de los vértices no existe, no se puede eliminar la arista
+        if (vertexV == null || vertexZ == null) {
+            return;
+        }
+        final VertexObj<V, E> v1 = vertexV;
+        final VertexObj<V, E> v2 = vertexZ;
+        // Eliminar la arista de la lista de aristas
+        secEdge.removeIf(edge -> edge.getEndVertex1().equals(v1) && edge.getEndVertex2().equals(v2));
+
+        // Si el grafo no es dirigido, también eliminar la arista en sentido contrario
+        if (!directed) {
+            secEdge.removeIf(edge -> edge.getEndVertex1().equals(v2) && edge.getEndVertex2().equals(v1));
+        }
+    }
+
+    // Método para eliminar un vértice
+    public void removeVertex(V v) {
+        // Buscar el vértice a eliminar
+        VertexObj<V, E> vertexToRemove = null;
+        for (VertexObj<V, E> vertex : secVertex) {
+            if (vertex.getInfo().equals(v)) {
+                vertexToRemove = vertex;
+                break;
+            }
+        }
+
+        // Si el vértice no existe, no hacer nada
+        if (vertexToRemove == null) {
+            return;
+        }
+        final VertexObj<V, E> vtr = vertexToRemove;
+        // Eliminar todas las aristas que conectan con este vértice
+        secEdge.removeIf(
+                edge -> edge.getEndVertex1().equals(vtr) || edge.getEndVertex2().equals(vtr));
+
+        // Finalmente, eliminar el vértice de la lista de vértices
+        secVertex.remove(vertexToRemove);
+    }
+
     // ////////////////////////////////////////////////////////////////////////
     // Ejercicio 7: Implementar para identificar si un grafo dirigido ingresado
     // indique el grado un nodo, de tipo camino, de tipo ciclo, de tipo rueda, de
