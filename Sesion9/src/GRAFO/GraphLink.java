@@ -86,8 +86,6 @@ public class GraphLink<E extends Comparable<E>> {
     public void removeVertex(E v) {
         try {
             Vertex<E> toRemove = null;
-
-            // Buscar el vértice que queremos eliminar
             for (int i = 0; i < listVertex.length(); i++) {
                 Vertex<E> vertex = listVertex.get(i);
                 if (vertex.getData().compareTo(v) == 0) {
@@ -97,21 +95,18 @@ public class GraphLink<E extends Comparable<E>> {
             }
 
             if (toRemove != null) {
-                // Primero eliminar todas las aristas que apuntan a este vértice
-                for (int i = 0; i < listVertex.length(); i++) {
-                    Vertex<E> vertex = listVertex.get(i);
-                    if (vertex != toRemove) { // No limpiar sus propias aristas aún
-                        for (int j = 0; j < vertex.listAdj.length(); j++) {
-                            Edge<E> edge = vertex.listAdj.get(j);
-                            if (edge.getRefDest().compareTo(toRemove) == 0) {
-                                vertex.listAdj.removeNode(edge);
-                                break;
-                            }
+                for (int i = 0; i < toRemove.listAdj.length(); i++) {
+                    Edge<E> edge = toRemove.listAdj.get(i);
+                    Vertex<E> destino = edge.getRefDest();
+                    for (int j = 0; j < destino.listAdj.length(); ) {
+                        Edge<E> reverseEdge = destino.listAdj.get(j);
+                        if (reverseEdge.getRefDest().compareTo(toRemove) == 0) {
+                            destino.listAdj.removeNode(reverseEdge);
+                        } else {
+                            j++;
                         }
                     }
                 }
-
-                // Ahora sí, eliminar el vértice de la lista de vértices
                 listVertex.removeNode(toRemove);
             }
         } catch (ExceptionIsEmpty e) {
@@ -120,29 +115,37 @@ public class GraphLink<E extends Comparable<E>> {
     }
     public void removeEdge(E v, E z) {
         try {
+            Vertex<E> origin = null;
             for (int i = 0; i < listVertex.length(); i++) {
                 Vertex<E> vertex = listVertex.get(i);
-
-                // Si el vértice es v, eliminar arista hacia z
                 if (vertex.getData().compareTo(v) == 0) {
-                    for (int j = 0; j < vertex.listAdj.length(); j++) {
-                        Edge<E> edge = vertex.listAdj.get(j);
-                        if (edge.getRefDest().getData().compareTo(z) == 0) {
-                            vertex.listAdj.removeNode(edge);
-                            break;
-                        }
+                    origin = vertex;
+                    break;
+                }
+            }
+
+            if (origin != null) {
+                Edge<E> toRemove = null;
+                Vertex<E> destination = null;
+                for (int i = 0; i < origin.listAdj.length(); i++) {
+                    Edge<E> edge = origin.listAdj.get(i);
+                    if (edge.getRefDest().getData().compareTo(z) == 0) {
+                        toRemove = edge;
+                        destination = edge.getRefDest();
+                        break;
                     }
                 }
-
-                // Si el vértice es z, eliminar arista hacia v
-                if (vertex.getData().compareTo(z) == 0) {
-                    for (int j = 0; j < vertex.listAdj.length(); j++) {
-                        Edge<E> edge = vertex.listAdj.get(j);
+                if (toRemove != null && destination != null) {
+                    for (int i = 0; i < destination.listAdj.length(); ) {
+                        Edge<E> edge = destination.listAdj.get(i);
                         if (edge.getRefDest().getData().compareTo(v) == 0) {
-                            vertex.listAdj.removeNode(edge);
+                            destination.listAdj.removeNode(edge);
                             break;
+                        } else {
+                            i++;
                         }
                     }
+                    origin.listAdj.removeNode(toRemove);
                 }
             }
         } catch (ExceptionIsEmpty e) {
@@ -177,9 +180,8 @@ public class GraphLink<E extends Comparable<E>> {
     // Métodos para remover vértices y aristas en grafo DIRIGIDO
     public void removeVertexDirigido(E v) {
         try {
-            Vertex<E> toRemove = null;
-
             // Buscar el vértice que queremos eliminar
+            Vertex<E> toRemove = null;
             for (int i = 0; i < listVertex.length(); i++) {
                 Vertex<E> vertex = listVertex.get(i);
                 if (vertex.getData().compareTo(v) == 0) {
@@ -202,7 +204,6 @@ public class GraphLink<E extends Comparable<E>> {
                         }
                     }
                 }
-
                 toRemove.listAdj.destroyList();
                 listVertex.removeNode(toRemove);
             }
@@ -214,8 +215,7 @@ public class GraphLink<E extends Comparable<E>> {
         try {
             for (int i = 0; i < listVertex.length(); i++) {
                 Vertex<E> vertex = listVertex.get(i);
-
-                // SOLO eliminar arista que va de v → z
+                //Eliminamos la unica arista que va desde v hasta z
                 if (vertex.getData().compareTo(v) == 0) {
                     for (int j = 0; j < vertex.listAdj.length(); j++) {
                         Edge<E> edge = vertex.listAdj.get(j);
@@ -234,8 +234,8 @@ public class GraphLink<E extends Comparable<E>> {
     // Método para recorrido en profundidad (dfs) en grafo NO DIRIGIDO y DIRIGIDO
     public void dfs(E data) {
         try {
-            Vertex<E> startVertex = null;
             // Buscar el vértice de inicio
+            Vertex<E> startVertex = null;
             for (int i = 0; i < listVertex.length(); i++) {
                 Vertex<E> vertex = listVertex.get(i);
                 if (vertex.getData().compareTo(data) == 0) {
@@ -249,11 +249,11 @@ public class GraphLink<E extends Comparable<E>> {
             }
             // Inicializar pila
             StackArray<Vertex<E>> stack = new StackArray<>(listVertex.length());
-
+            // Poner todos los vértices como NO VISITADOS
             for (int i = 0; i < listVertex.length(); i++) {
                 listVertex.get(i).setVisited(false);
             }
-
+            // Empezar el recorrido en profundidad
             stack.push(startVertex);
             System.out.print("Recorrido DFS: ");
             while (!stack.isEmpty()) {
@@ -264,7 +264,6 @@ public class GraphLink<E extends Comparable<E>> {
                     for (int i = 0; i < current.listAdj.length(); i++) {
                         Edge<E> edge = current.listAdj.get(i);
                         Vertex<E> neighbor = edge.getRefDest();
-
                         if (!neighbor.isVisited()) {
                             stack.push(neighbor);
                         }
@@ -280,8 +279,8 @@ public class GraphLink<E extends Comparable<E>> {
     // Método para recorrido en anchura (bfs) en grafo NO DIRIGIDO y DIRIGIDO
     public void bfs(E data) {
         try {
-            Vertex<E> startVertex = null;
             // Buscar el vértice de inicio
+            Vertex<E> startVertex = null;
             for (int i = 0; i < listVertex.length(); i++) {
                 Vertex<E> vertex = listVertex.get(i);
                 if (vertex.getData().compareTo(data) == 0) {
@@ -293,12 +292,13 @@ public class GraphLink<E extends Comparable<E>> {
                 System.out.println("El vértice de inicio no existe.");
                 return;
             }
-
             // Inicializar la cola
             QueueLink<Vertex<E>> queue = new QueueLink<>();
+            // Poner todos los vértices como NO VISITADOS
             for (int i = 0; i < listVertex.length(); i++) {
                 listVertex.get(i).setVisited(false);
             }
+            // Empezar el recorrido en anchura
             queue.enqueue(startVertex);
             startVertex.setVisited(true);
             System.out.print("Recorrido BFS: ");
@@ -424,7 +424,6 @@ public class GraphLink<E extends Comparable<E>> {
             Vertex<E> u = pq.dequeue();
             if (u.isVisited()) continue;
             u.setVisited(true);
-
             Node<Edge<E>> edgeNode = u.listAdj.getFirst();
             while (edgeNode != null) {
                 Edge<E> edge = edgeNode.getElemento();
@@ -441,31 +440,27 @@ public class GraphLink<E extends Comparable<E>> {
                 edgeNode = edgeNode.getNext();
             }
         }
-
         // Reconstruir el camino desde destino a origen
         ArrayList<Vertex<E>> path = new ArrayList<>();
         Vertex<E> step = destination;
-
         if (!predecessors.containsKey(step) && !step.equals(source)) {
-            return path; // No hay camino
+            return path;
         }
-
         while (step != null) {
-            path.add(0, step); // Insertar al inicio
+            path.add(0, step);
             step = predecessors.get(step);
         }
-
         return path;
     }
 
     // Método para corroborar que un grafo es conexo
     public boolean isConexo() throws ExceptionEmptyLinkedList {
+        // Un grafo vacío es un grafo conexo
         if (listVertex.isEmptyList()) {
             return true;
         }
         Vertex<E> startVertex = listVertex.getFirst().getElemento();
         bfs(startVertex.getData());
-
         // Verificamos si todos los vértices fueron visitados
         Node<Vertex<E>> current = listVertex.getFirst();
         while (current != null) {
@@ -479,18 +474,15 @@ public class GraphLink<E extends Comparable<E>> {
 
     // Método de Dijkstra para hallar el menor recorrido de un vértice a otro
     public StackArray<E> dijkstra(E v, E w) throws ExceptionEmptyLinkedList, ExceptionIsEmpty {
-        // Paso 1: Inicializar estructuras
         HashMap<Vertex<E>, Integer> distancias = new HashMap<>();
         HashMap<Vertex<E>, Vertex<E>> predecesores = new HashMap<>();
         PriorityQueueLinkSort<Vertex<E>, Integer> pq = new PriorityQueueLinkSort<>();
-
         // Inicializar todas las distancias a infinito (usaremos Integer.MAX_VALUE)
         for (int i = 0; i < listVertex.length(); i++) {
             Vertex<E> vertex = listVertex.get(i);
             distancias.put(vertex, Integer.MAX_VALUE);
             predecesores.put(vertex, null);
         }
-
         // Encontrar vértice de inicio y de destino
         Vertex<E> startVertex = null;
         Vertex<E> endVertex = null;
@@ -507,12 +499,10 @@ public class GraphLink<E extends Comparable<E>> {
             System.out.println("Alguno de los vértices no existe.");
             return new StackArray<>(listVertex.length());
         }
-
         // Inicializamos distancia del vértice de inicio a 0
         distancias.put(startVertex, 0);
         pq.enqueue(startVertex, 0);
-
-        // Paso 2: Algoritmo de Dijkstra
+        // Algoritmo de Dijkstra
         while (!pq.isEmpty()) {
             Vertex<E> current = pq.dequeue();
             for (int i = 0; i < current.listAdj.length(); i++) {
@@ -526,8 +516,7 @@ public class GraphLink<E extends Comparable<E>> {
                 }
             }
         }
-
-        // Paso 3: Reconstruir la ruta más corta (de w hacia v)
+        // Reconstruir la ruta más corta (de w hacia v)
         StackArray<E> ruta = new StackArray<>(listVertex.length());
         Vertex<E> step = endVertex;
         if (predecesores.get(step) == null && step != startVertex) {
@@ -679,7 +668,6 @@ public class GraphLink<E extends Comparable<E>> {
         int n = listVertex.length();
         int[] entrada = new int[n];
         int[] salida = new int[n];
-
         // Contar grados de entrada y salida
         for (int i = 0; i < n; i++) {
             try {
@@ -697,7 +685,7 @@ public class GraphLink<E extends Comparable<E>> {
                 System.out.println("Error: " + e.getMessage());
             }
         }
-
+        // Mostrar grados de los vértices
         System.out.println("\n--- Grados de los nodos (Dirigido) ---");
         for (int i = 0; i < n; i++) {
             try {
@@ -722,30 +710,27 @@ public class GraphLink<E extends Comparable<E>> {
             if (entrada[i] > 1 || salida[i] > 1) {
                 esCamino = false;
             }
-
             // Ciclo
             if (entrada[i] != 1 || salida[i] != 1) {
                 esCiclo = false;
             }
-
             // Completo
             if (entrada[i] != n - 1 || salida[i] != n - 1) {
                 esCompleto = false;
             }
-
-            // Rueda
-            if (salida[i] == n - 1 && entrada[i] == 0) {
+            // Rueda (centro emisor o receptor)
+            boolean centroEmisor = (salida[i] == n - 1 && entrada[i] == 0);
+            boolean centroReceptor = (entrada[i] == n - 1 && salida[i] == 0);
+            if (centroEmisor || centroReceptor) {
                 cuentaCentroRueda++;
             } else if (entrada[i] == 1 && salida[i] == 1) {
                 cuentaNodosCicloRueda++;
             }
         }
-
         // Condición de rueda
         if (cuentaCentroRueda == 1 && cuentaNodosCicloRueda == n - 1) {
             esRueda = true;
         }
-
         // Mostrar resultado
         if (esCompleto) {
             System.out.println("El grafo dirigido es COMPLETO (K" + n + ")");
