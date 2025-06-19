@@ -118,8 +118,9 @@ public class BTree<E extends Comparable<E>> {
             } else {
                 boolean isDeleted = delete(node.childs.get(pos[0]), key);
                 if(node.childs.get(pos[0]).count < (orden - 1) / 2) {
-
+                    fix(node, pos[0]);
                 }
+                return isDeleted;
             }
         }
     }
@@ -143,7 +144,11 @@ public class BTree<E extends Comparable<E>> {
         } else if(index < parent.count && parent.childs.get(index + 1).count > 0) {
             borrowFromRight(parent, index);
         } else {
-
+            if(index > 0) {
+                merge(parent, index - 1);
+            } else {
+                merge(parent, index);
+            }
         }
     }
     private void merge(BNode<E> parent, int index) {
@@ -185,22 +190,20 @@ public class BTree<E extends Comparable<E>> {
         left.count--;
     }
     private void borrowFromRight(BNode<E> parent, int index) {
-        BNode<E> right = parent.childs.get(index + 1);
         BNode<E> current = parent.childs.get(index);
-        for(int i = current.count - 1; i >= 0; i++) {
-            current.keys.set(i + 1, current.keys.get(i));
-        }
+        BNode<E> right = parent.childs.get(index + 1);
         current.keys.set(current.count, parent.keys.get(index));
         parent.keys.set(index, right.keys.get(0));
         if(right.childs.get(right.count) != null) {
-            for(int i = current.count; i >= 0; i--) {
-                current.childs.set(i + 1, current.childs.get(i));
+            current.childs.set(current.count + 1, right.childs.get(0));
+            for(int i = 0; i <= right.count; i++) {
+                right.keys.set(i, right.keys.get(i + 1));
+                right.childs.set(i, right.childs.get(i + 1));
             }
-            current.childs.set(0, left.childs.get(left.count));
-            left.childs.set(left.count, null);
         }
-        right.keys.set(right.count - 1, null);
+        right.keys.set(right.count, null);
+        right.childs.set(right.count + 1, null);
         current.count++;
-        left.count--;
+        right.count--;
     }
 }
