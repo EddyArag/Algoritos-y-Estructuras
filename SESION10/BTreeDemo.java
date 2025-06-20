@@ -3,19 +3,23 @@ package SESION10;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class BTreeDemo extends JFrame {
     private BTree<Integer> btree;
-    private JTextArea outputArea;
     private JTextField inputField;
+    private BTreePanel treePanel;
 
     public BTreeDemo() {
-        setTitle("Demostración de Árbol B");
-        setSize(500, 400);
+        // Pedir al usuario el orden del árbol al inicio
+        int order = solicitarOrden();
+
+        setTitle("Demostración de Árbol B (Orden " + order + ")");
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        btree = new BTree<>(4); // Orden 4
+        btree = new BTree<>(order);
 
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
@@ -31,12 +35,10 @@ public class BTreeDemo extends JFrame {
         panel.add(deleteButton);
         panel.add(showButton);
 
-        outputArea = new JTextArea(15, 40);
-        outputArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(outputArea);
+        treePanel = new BTreePanel();
 
         add(panel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(treePanel, BorderLayout.CENTER);
 
         // Acciones
         insertButton.addActionListener(e -> insertarClave());
@@ -44,12 +46,25 @@ public class BTreeDemo extends JFrame {
         showButton.addActionListener(e -> mostrarArbol());
     }
 
+    private int solicitarOrden() {
+        while (true) {
+            String input = JOptionPane.showInputDialog(null, "Ingrese el orden del árbol B (mínimo 3):", "Orden del Árbol", JOptionPane.QUESTION_MESSAGE);
+            try {
+                int orden = Integer.parseInt(input);
+                if (orden >= 3) return orden;
+                else JOptionPane.showMessageDialog(null, "El orden debe ser al menos 3.");
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Por favor ingrese un número válido.");
+            }
+        }
+    }
+
     private void insertarClave() {
         try {
             int clave = Integer.parseInt(inputField.getText());
             btree.insert(clave);
-            outputArea.append("Insertado: " + clave + "\n");
             inputField.setText("");
+            treePanel.repaint();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Por favor ingresa un número entero.");
         }
@@ -59,36 +74,57 @@ public class BTreeDemo extends JFrame {
         try {
             int clave = Integer.parseInt(inputField.getText());
             btree.delete(clave);
-            outputArea.append("Eliminado: " + clave + "\n");
             inputField.setText("");
+            treePanel.repaint();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Por favor ingresa un número válido.");
         } catch (ExceptionIsEmpty e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "El nodo no existe en el árbol.");
         }
     }
 
     private void mostrarArbol() {
-        outputArea.append("Contenido en orden:\n");
-        printInOrder(btree, outputArea);
+        treePanel.repaint();
     }
 
-    private void printInOrder(BTree<Integer> tree, JTextArea area) {
-        if (tree.isEmpty()) {
-            area.append("(Árbol vacío)\n");
-            return;
-        }
-        printNode(tree.root, area, 0);
-    }
+    private class BTreePanel extends JPanel {
+        private final int NODE_HEIGHT = 40;
+        private final int KEY_WIDTH = 30;
+        private final int LEVEL_GAP = 70;
 
-    private void printNode(BNode<Integer> node, JTextArea area, int level) {
-        if (node == null) return;
-
-        for (int i = 0; i < node.count; i++) {
-            printNode(node.childs.get(i), area, level + 1);
-            area.append(" ".repeat(level * 4) + "- " + node.keys.get(i) + "\n");
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (btree.isEmpty()) {
+                g.drawString("(Árbol vacío)", 10, 20);
+            } else {
+                drawNode(g, btree.getRoot(), getWidth() / 2, 30, getWidth() / 4);
+            }
         }
-        printNode(node.childs.get(node.count), area, level + 1);
+
+        private void drawNode(Graphics g, BNode<Integer> node, int x, int y, int xOffset) {
+            if (node == null) return;
+
+            int totalWidth = node.count * KEY_WIDTH;
+            int startX = x - totalWidth / 2;
+
+            // Dibujar llaves
+            for (int i = 0; i < node.count; i++) {
+                g.drawRect(startX + i * KEY_WIDTH, y, KEY_WIDTH, NODE_HEIGHT);
+                g.drawString(node.keys.get(i).toString(), startX + i * KEY_WIDTH + 10, y + 25);
+            }
+
+            // Dibujar hijos
+            for (int i = 0; i <= node.count; i++) {
+                if (node.childs.get(i) != null) {
+                    int childX = x - xOffset + i * (2 * xOffset / (node.count + 1));
+                    g.drawLine(x, y + NODE_HEIGHT, childX, y + LEVEL_GAP);
+                    drawNode(g, node.childs.get(i), childX, y + LEVEL_GAP, xOffset / 2);
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {

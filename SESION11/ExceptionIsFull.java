@@ -1,7 +1,7 @@
-package SESION10;
+package SESION11;
 
-public class ExceptionIsEmpty extends Exception {
-    public ExceptionIsEmpty(String mensaje) {
+public class ExceptionIsFull extends Exception {
+    public ExceptionIsFull(String mensaje) {
         super(mensaje);
     }
 }
