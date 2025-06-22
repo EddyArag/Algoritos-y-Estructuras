@@ -6,6 +6,7 @@ public class BPlusNode<E> {
     protected ArrayList<BPlusNode<E>> childs;
     protected int count;
     protected boolean isLeaf;
+    protected BPlusNode<E> next;
     
     public BPlusNode(int n, boolean isLeaf) {
         this.keys = new ArrayList<E>(n);
@@ -16,6 +17,7 @@ public class BPlusNode<E> {
             this.childs.add(null);
         }
         this.isLeaf = isLeaf;
+        this.next = null;
     }
     
     public boolean nodeFull(int maxKeys) {
@@ -26,6 +28,12 @@ public class BPlusNode<E> {
     }
     public boolean isLeaf() {
         return isLeaf;
+    }
+    public void setNext(BPlusNode<E> next) {
+        this.next = next;
+    }
+    public BPlusNode<E> getNext() {
+        return next;
     }
     
     public boolean searchNode(E key, int pos[]) {
