@@ -9,9 +9,15 @@ public class Register {
         this.name = name;
     }
 
-    public int getKey() {return key; }
-    public String getName() { return name; }
+    public int getKey() {
+        return key;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public String toString() {
         return "(" + key + ", " + name + ")";
     }
