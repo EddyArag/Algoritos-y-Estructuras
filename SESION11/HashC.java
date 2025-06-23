@@ -1,8 +1,8 @@
 package SESION11;
 
-public class HashC {
-    private static class Element {
-        Register register;
+public class HashC<E> {
+    private static class Element<E> {
+        Register<E> register;
         boolean isAvailable;
 
         public Element() {
@@ -11,20 +11,22 @@ public class HashC {
         }
     }
 
-    private Element[] table;
+    private Element<E>[] table;
     private int size;
 
     public HashC(int size) {
-        this.size=size;this.table=new Element[size];
-        for(int i = 0; i < size; i++) {
-            table[i] = new Element();
+        this.size = size;
+        this.table = new Element[size];
+        for (int i = 0; i < size; i++) {
+            table[i] = new Element<>();
         }
     }
 
+    private int hash(int key) {
+        return key % size;
+    }
 
-    
-
-    public void insert(Register reg) {
+    public void insert(Register<E> reg) {
         int key = reg.getKey();
         int pos = hash(key);
         int start = pos;
@@ -41,11 +43,12 @@ public class HashC {
         System.out.println("Error: tabla llena");
     }
 
-    public Register search(int key) {
+    public Register<E> search(int key) {
         int pos = hash(key);
         int start = pos;
         do {
-            if (!table[pos].isAvailable && table[pos].register.getKey() == key) {
+            if (!table[pos].isAvailable && table[pos].register != null &&
+                    table[pos].register.getKey() == key) {
                 System.out.println("Encontrado en posición " + pos);
                 return table[pos].register;
             }
@@ -59,7 +62,8 @@ public class HashC {
         int pos = hash(key);
         int start = pos;
         do {
-            if (!table[pos].isAvailable && table[pos].register != null && table[pos].register.getKey() == key) {
+            if (!table[pos].isAvailable && table[pos].register != null &&
+                    table[pos].register.getKey() == key) {
                 table[pos].register = null;
                 table[pos].isAvailable = true;
                 System.out.println("Clave " + key + " eliminada lógicamente en posición " + pos);

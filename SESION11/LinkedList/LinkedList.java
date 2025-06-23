@@ -1,4 +1,4 @@
-package Sesion9.src.LISTA;
+package SESION11.LinkedList;
 
 import Sesion9.src.ExceptionIsEmpty;
 import Sesion9.src.Node;

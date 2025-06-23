@@ -1,24 +1,29 @@
 package SESION11;
 
-public class Register {
+public class Register<E> implements Comparable<Register<E>> {
     private int key;
-    private String name;
+    private E value;
 
-    public Register(int key, String name) {
+    public Register(int key, E value) {
         this.key = key;
-        this.name = name;
+        this.value = value;
     }
 
     public int getKey() {
         return key;
     }
 
-    public String getName() {
-        return name;
+    public E getValue() {
+        return value;
+    }
+
+    @Override
+    public int compareTo(Register<E> other) {
+        return Integer.compare(this.key, other.key);
     }
 
     @Override
     public String toString() {
-        return "(" + key + ", " + name + ")";
+        return "(" + key + ", " + value + ")";
     }
 }
