@@ -5,11 +5,14 @@ import java.util.List;
 public class HashC<E extends Comparable<E>> {
     private static class Element<E extends Comparable<E>> {
         Register<E> register;
-        boolean isAvailable;
+        int isAvailable;
+        //1: Elemento lleno
+        //0: Elemento vacío
+        //-1: Elemento vacío pero estaba lleno
 
         public Element() {
             this.register = null;
-            this.isAvailable = true;
+            this.isAvailable = 0;
         }
     }
 
@@ -28,35 +31,35 @@ public class HashC<E extends Comparable<E>> {
         return key % size;
     }
 
-    public void insert(Register<E> reg) {
-        int key = reg.getKey();
-        int pos = hash(key);
+    public int linearProbing(int pos) {
         int start = pos;
         do {
-            if (table[pos].isAvailable) {
-                table[pos].register = reg;
-                table[pos].isAvailable = false;
-                System.out.println("Insertado en posición " + pos);
-                return;
+            if(table[pos].isAvailable == 0) {
+                return pos;
             }
             pos = (pos + 1) % size;
         } while (pos != start);
-
-        System.out.println("Error: tabla llena");
+        return -1;
+    }
+    public void insert(Register<E> reg) throws ExceptionIsFull{
+        int key = reg.getKey();
+        int pos = linearProbing(hash(key));
+        if(pos == -1) {
+            throw new ExceptionIsFull("La tabla está llena.");
+        } else {
+            table[pos].register = reg;
+        }
     }
 
     public Register<E> search(int key) {
         int pos = hash(key);
         int start = pos;
         do {
-            if (!table[pos].isAvailable && table[pos].register != null &&
-                    table[pos].register.getKey() == key) {
-                System.out.println("Encontrado en posición " + pos);
+            if (table[pos].isAvailable == 1 && table[pos].register.getKey() == key) {
                 return table[pos].register;
             }
             pos = (pos + 1) % size;
-        } while (pos != start);
-        System.out.println("No se encontró la clave " + key);
+        } while (pos != start || table[pos].isAvailable == 0);
         return null;
     }
 
@@ -64,33 +67,33 @@ public class HashC<E extends Comparable<E>> {
         int pos = hash(key);
         int start = pos;
         do {
-            if (!table[pos].isAvailable && table[pos].register != null &&
-                    table[pos].register.getKey() == key) {
-                table[pos].register = null;
-                table[pos].isAvailable = true;
-                System.out.println("Clave " + key + " eliminada lógicamente en posición " + pos);
+            if (table[pos].isAvailable == 1 && table[pos].register.getKey() == key) {
+                
+                System.out.println("Se eliminó el registro con la clase " + key);
                 return;
             }
             pos = (pos + 1) % size;
-        } while (pos != start);
+        } while (pos != start || table[pos].isAvailable == 0);
         System.out.println("No se encontró la clave " + key + " para eliminar");
     }
 
     public void printTable() {
         System.out.println("\nEstado de la tabla:");
-        for (int i = 0; i < size; i++) {
-            if (!table[i].isAvailable && table[i].register != null) {
-                System.out.println("Posición " + i + ": " + table[i].register);
-            } else {
-                System.out.println("Posición " + i + ": ---");
+        int pos = 0;
+        do {
+            if (table[pos].isAvailable == 1) {
+                System.out.println(table[pos].register.toString());
+                return;
             }
-        }
+            pos = (pos + 1) % size;
+        } while (pos != 0 || table[pos].isAvailable == 0);
     }
 
+    //FALTA MODIFICAR PARA LA INTERFAZ
     public List<Register<E>> getAll() {
         List<Register<E>> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            if (!table[i].isAvailable && table[i].register != null) {
+            if (table[i].isAvailable == 1) {
                 list.add(table[i].register);
             }
         }
