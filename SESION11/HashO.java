@@ -1,7 +1,7 @@
 package SESION11;
 import SESION11.LinkedList.*;
 
-public class HashO<E> {
+public class HashO<E extends Comparable<E>> {
     private static class Element<T extends Comparable<T>> {
         LinkedList<T> list;
 
@@ -9,11 +9,9 @@ public class HashO<E> {
             this.list = new LinkedList<>();
         }
     }
-
     private Element<Register<E>>[] table;
     private int size;
 
-    @SuppressWarnings("unchecked")
     public HashO(int size) {
         this.size = size;
         this.table = new Element[size];
@@ -41,48 +39,33 @@ public class HashO<E> {
         System.out.println("Insertado en posición " + pos);
     }
 
-    public Register<E> search(int key) {
+    public Register<E> search(int key, E value) {
         int pos = hash(key);
-        Node<Register<E>> current = table[pos].list.getFirst();
-        while (current != null) {
-            if (current.getElemento().getKey() == key) {
-                System.out.println("Encontrado en posición " + pos);
-                return current.getElemento();
-            }
-            current = current.getNext();
-        }
-        System.out.println("No se encontró la clave " + key);
-        return null;
-    }
-
-    public void delete(int key) {
-        int pos = hash(key);
-        Node<Register<E>> current = table[pos].list.getFirst();
-        Node<Register<E>> prev = null;
-
-        Node<Register<E>> lastMatch = null;
-        Node<Register<E>> lastMatchPrev = null;
-
-        while (current != null) {
-            if (current.getElemento().getKey() == key) {
-                lastMatch = current;
-                lastMatchPrev = prev;
-            }
-            prev = current;
-            current = current.getNext();
-        }
-
-        if (lastMatch != null) {
-            if (lastMatchPrev == null) {
-                table[pos].list.setFirst(lastMatch.getNext());
+        try {
+            int index = table[pos].list.search(new Register<>(key, value));
+            if (index != -1) {
+                System.out.println("Encontrado en posición " + pos + ", índice " + index);
+                return table[pos].list.get(index);
             } else {
-                lastMatchPrev.setNext(lastMatch.getNext());
+                System.out.println("No se encontró el registro con clave " + key + " y valor " + value);
+                return null;
             }
-            System.out.println("Se eliminó el último registro con clave " + key + " en posición " + pos);
-        } else {
-            System.out.println("No se encontró la clave " + key + " para eliminar");
+        } catch (ExceptionIsEmpty e) {
+            System.out.println("La lista en la posición " + pos + " está vacía.");
+            return null;
         }
     }
+
+    public void delete(int key, E value) {
+    int pos = hash(key);
+    try {
+        table[pos].list.removeNode(new Register<>(key, value));
+        System.out.println("Se eliminó un registro con clave " + key + " en posición " + pos);
+    } catch (ExceptionIsEmpty e) {
+        System.out.println("La lista en la posición " + pos + " está vacía.");
+    }
+}
+
 
     public void printTable() {
         System.out.println("\nEstado de la tabla:");

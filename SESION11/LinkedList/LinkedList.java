@@ -19,16 +19,6 @@ public class LinkedList<E extends Comparable<E>> {
         return first == null;
     }
 
-    public void addFirst(E data) {
-        Node<E> newNode = new Node<>(data);
-        if (isEmptyList()) {
-            first = newNode;
-        } else {
-            newNode.setNext(first);
-            first = newNode;
-        }
-    }
-
     public void addLast(E data) {
         Node<E> newNode = new Node<>(data);
         if (isEmptyList()) {

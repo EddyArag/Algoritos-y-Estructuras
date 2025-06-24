@@ -1,6 +1,6 @@
 package SESION11;
 
-public class Register<E> implements Comparable<Register<E>> {
+public class Register<E extends Comparable<E>> implements Comparable<Register<E>> {
     private int key;
     private E value;
 
@@ -19,7 +19,7 @@ public class Register<E> implements Comparable<Register<E>> {
 
     @Override
     public int compareTo(Register<E> other) {
-        return Integer.compare(this.key, other.key);
+        return this.value.compareTo(other.getValue());
     }
 
     @Override

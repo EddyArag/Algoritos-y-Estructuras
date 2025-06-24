@@ -1,13 +1,13 @@
 package SESION11;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
 import SESION11.LinkedList.*;
 
 public class HashOInterface extends JFrame {
     private HashO<String> hashTable;
-    private JTextField keyField, nameField, searchKeyField, deleteKeyField;
+    private JTextField keyField, nameField;
+    private JTextField searchKeyField, searchValueField;
+    private JTextField deleteKeyField, deleteValueField;
     private JTextArea tableArea;
     private JButton insertButton, searchButton, deleteButton;
 
@@ -18,7 +18,7 @@ public class HashOInterface extends JFrame {
         setupLayout();
         setupListeners();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 500);
+        setSize(650, 550);
         setLocationRelativeTo(null);
         setVisible(true);
         refreshTable(); // Mostrar tabla vacía al inicio
@@ -27,14 +27,18 @@ public class HashOInterface extends JFrame {
     private void initializeComponents() {
         keyField = createStyledTextField();
         nameField = createStyledTextField();
+
         searchKeyField = createStyledTextField();
+        searchValueField = createStyledTextField();
+
         deleteKeyField = createStyledTextField();
+        deleteValueField = createStyledTextField();
 
         insertButton = createStyledButton("Insertar", new Color(34, 139, 34));
         searchButton = createStyledButton("Buscar", new Color(255, 165, 0));
         deleteButton = createStyledButton("Eliminar", new Color(220, 20, 60));
 
-        tableArea = new JTextArea(15, 40);
+        tableArea = new JTextArea(15, 45);
         tableArea.setEditable(false);
         tableArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
         tableArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -59,10 +63,10 @@ public class HashOInterface extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Panel superior
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new GridLayout(3, 1, 5, 5));
 
+        // Panel Insertar
         JPanel insertPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         insertPanel.setBorder(BorderFactory.createTitledBorder("Insertar"));
         insertPanel.add(new JLabel("Clave:"));
@@ -71,16 +75,22 @@ public class HashOInterface extends JFrame {
         insertPanel.add(nameField);
         insertPanel.add(insertButton);
 
+        // Panel Buscar
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBorder(BorderFactory.createTitledBorder("Buscar"));
         searchPanel.add(new JLabel("Clave:"));
         searchPanel.add(searchKeyField);
+        searchPanel.add(new JLabel("Nombre:"));
+        searchPanel.add(searchValueField);
         searchPanel.add(searchButton);
 
+        // Panel Eliminar
         JPanel deletePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         deletePanel.setBorder(BorderFactory.createTitledBorder("Eliminar"));
         deletePanel.add(new JLabel("Clave:"));
         deletePanel.add(deleteKeyField);
+        deletePanel.add(new JLabel("Nombre:"));
+        deletePanel.add(deleteValueField);
         deletePanel.add(deleteButton);
 
         topPanel.add(insertPanel);
@@ -117,13 +127,19 @@ public class HashOInterface extends JFrame {
         searchButton.addActionListener(e -> {
             try {
                 int key = Integer.parseInt(searchKeyField.getText().trim());
-                Register<String> reg = hashTable.search(key);
+                String value = searchValueField.getText().trim();
+                if (value.isEmpty()) {
+                    showMessage("El nombre no puede estar vacío.");
+                    return;
+                }
+                Register<String> reg = hashTable.search(key, value);
                 if (reg != null) {
                     showMessage("Registro encontrado: " + reg);
                 } else {
                     showMessage("No se encontró el registro.");
                 }
                 searchKeyField.setText("");
+                searchValueField.setText("");
             } catch (NumberFormatException ex) {
                 showMessage("Clave inválida.");
             }
@@ -132,8 +148,14 @@ public class HashOInterface extends JFrame {
         deleteButton.addActionListener(e -> {
             try {
                 int key = Integer.parseInt(deleteKeyField.getText().trim());
-                hashTable.delete(key);
+                String value = deleteValueField.getText().trim();
+                if (value.isEmpty()) {
+                    showMessage("El nombre no puede estar vacío.");
+                    return;
+                }
+                hashTable.delete(key, value);
                 deleteKeyField.setText("");
+                deleteValueField.setText("");
                 refreshTable();
             } catch (NumberFormatException ex) {
                 showMessage("Clave inválida.");

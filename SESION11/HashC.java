@@ -2,8 +2,8 @@ package SESION11;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HashC<E> {
-    private static class Element<E> {
+public class HashC<E extends Comparable<E>> {
+    private static class Element<E extends Comparable<E>> {
         Register<E> register;
         boolean isAvailable;
 
