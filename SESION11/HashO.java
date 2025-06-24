@@ -13,7 +13,6 @@ public class HashO<E> {
     private Element<Register<E>>[] table;
     private int size;
 
-    @SuppressWarnings("unchecked")
     public HashO(int size) {
         this.size = size;
         this.table = new Element[size];
