@@ -1,35 +1,35 @@
 package SESION11.LinkedList;
 
-public class Node<E extends Comparable<E>> implements Comparable<E> {
-    private E elemento;
-    private Node<E> next;
+public class Node<T extends Comparable<T>> implements Comparable<T> {
+    private T elemento;
+    private Node<T> next;
 
     // Constructor de la clase Node
-    public Node(E elemento) {
+    public Node(T elemento) {
         this.elemento = elemento;
         this.next = null;
     }
 
     // Setters y Getters de elemento y next
-    public void setElemento(E elemento) {
+    public void setElemento(T elemento) {
         this.elemento = elemento;
     }
 
-    public E getElemento() {
+    public T getElemento() {
         return elemento;
     }
 
-    public void setNext(Node<E> next) {
+    public void setNext(Node<T> next) {
         this.next = next;
     }
 
-    public Node<E> getNext() {
+    public Node<T> getNext() {
         return next;
     }
 
     // Método comparteTo para comparar tipos genéricos
     @Override
-    public int compareTo(E otroElemento) {
+    public int compareTo(T otroElemento) {
         return elemento.compareTo(otroElemento);
     }
 }

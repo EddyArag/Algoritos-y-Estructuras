@@ -1,4 +1,6 @@
 package SESION11;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HashC<E> {
     private static class Element<E> {
@@ -83,5 +85,15 @@ public class HashC<E> {
                 System.out.println("Posición " + i + ": ---");
             }
         }
+    }
+
+    public List<Register<E>> getAll() {
+        List<Register<E>> list = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            if (!table[i].isAvailable && table[i].register != null) {
+                list.add(table[i].register);
+            }
+        }
+        return list;
     }
 }

@@ -1,18 +1,33 @@
-import SESION11.LinkedList.LinkedList;
-import SESION11.LinkedList.ExceptionIsEmpty;
+package SESION11;
+import SESION11.LinkedList.*;
 
 public class HashO<E> {
-    private LinkedList<Register<E>>[] tabla;
+    private static class Element<T extends Comparable<T>> {
+        LinkedList<T> list;
+
+        public Element() {
+            this.list = new LinkedList<>();
+        }
+    }
+
+    private Element<Register<E>>[] table;
     private int size;
 
     @SuppressWarnings("unchecked")
     public HashO(int size) {
         this.size = size;
-        this.tabla = new LinkedList[size];
-
+        this.table = new Element[size];
         for (int i = 0; i < size; i++) {
-            tabla[i] = new LinkedList<>();
+            table[i] = new Element<>();
         }
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public LinkedList<Register<E>> getBucket(int index) {
+        return table[index].list;
     }
 
     private int hash(int key) {
@@ -20,60 +35,63 @@ public class HashO<E> {
     }
 
     public void insert(Register<E> reg) {
-        int pos = hash(reg.getKey());
-        tabla[pos].addLast(reg);
-        System.out.println("Insertado en índice " + pos);
+        int key = reg.getKey();
+        int pos = hash(key);
+        table[pos].list.addLast(reg);
+        System.out.println("Insertado en posición " + pos);
     }
 
     public Register<E> search(int key) {
         int pos = hash(key);
-        try {
-            for (int i = 0; i < tabla[pos].length(); i++) {
-                Register<E> reg = tabla[pos].get(i);
-                if (reg.getKey() == key) {
-                    System.out.println("Encontrado en índice " + pos);
-                    return reg;
-                }
+        Node<Register<E>> current = table[pos].list.getFirst();
+        while (current != null) {
+            if (current.getElemento().getKey() == key) {
+                System.out.println("Encontrado en posición " + pos);
+                return current.getElemento();
             }
-        } catch (ExceptionIsEmpty e) {
-            // La lista está vacía, no hay nada que buscar
+            current = current.getNext();
         }
-        System.out.println("Clave " + key + " no encontrada");
+        System.out.println("No se encontró la clave " + key);
         return null;
     }
 
     public void delete(int key) {
         int pos = hash(key);
-        try {
-            for (int i = 0; i < tabla[pos].length(); i++) {
-                Register<E> reg = tabla[pos].get(i);
-                if (reg.getKey() == key) {
-                    tabla[pos].removeNode(reg);
-                    System.out.println("Clave " + key + " eliminada de índice " + pos);
-                    return;
-                }
+        Node<Register<E>> current = table[pos].list.getFirst();
+        Node<Register<E>> prev = null;
+
+        Node<Register<E>> lastMatch = null;
+        Node<Register<E>> lastMatchPrev = null;
+
+        while (current != null) {
+            if (current.getElemento().getKey() == key) {
+                lastMatch = current;
+                lastMatchPrev = prev;
             }
-        } catch (ExceptionIsEmpty e) {
-            // La lista está vacía, no hay nada que eliminar
+            prev = current;
+            current = current.getNext();
         }
-        System.out.println("Clave " + key + " no encontrada para eliminar");
+
+        if (lastMatch != null) {
+            if (lastMatchPrev == null) {
+                table[pos].list.setFirst(lastMatch.getNext());
+            } else {
+                lastMatchPrev.setNext(lastMatch.getNext());
+            }
+            System.out.println("Se eliminó el último registro con clave " + key + " en posición " + pos);
+        } else {
+            System.out.println("No se encontró la clave " + key + " para eliminar");
+        }
     }
 
     public void printTable() {
-        System.out.println("\nContenido de la tabla hash (abierta):");
+        System.out.println("\nEstado de la tabla:");
         for (int i = 0; i < size; i++) {
-            System.out.print("Índice " + i + ": ");
-            try {
-                if (tabla[i].isEmptyList()) {
-                    System.out.println("---");
-                } else {
-                    for (int j = 0; j < tabla[i].length(); j++) {
-                        System.out.print(tabla[i].get(j) + " -> ");
-                    }
-                    System.out.println("null");
-                }
-            } catch (ExceptionIsEmpty e) {
+            System.out.print("Posición " + i + ": ");
+            if (table[i].list.isEmptyList()) {
                 System.out.println("---");
+            } else {
+                System.out.println(table[i].list.toString());
             }
         }
     }

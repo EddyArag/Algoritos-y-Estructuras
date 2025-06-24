@@ -1,200 +1,179 @@
 package SESION11;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.util.List;
+import SESION11.LinkedList.*;
 
 public class HashOInterface extends JFrame {
-    private HashO hashTable;
-    private JTextField sizeField, keyField, nameField, searchField, deleteField;
-    private JTextArea outputArea;
+    private HashO<String> hashTable;
+    private JTextField keyField, nameField, searchKeyField, deleteKeyField;
+    private JTextArea tableArea;
+    private JButton insertButton, searchButton, deleteButton;
 
-    public HashOInterface() {
-        super("Hash Table con Encadenamiento");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Inicializar componentes
-        initComponents();
-
-        // Configurar layout
+    public HashOInterface(int tableSize) {
+        super("Hash Abierto (Encadenamiento)");
+        hashTable = new HashO<>(tableSize);
+        initializeComponents();
         setupLayout();
-
-        pack();
+        setupListeners();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(600, 500);
         setLocationRelativeTo(null);
         setVisible(true);
+        refreshTable(); // Mostrar tabla vacía al inicio
     }
 
-    private void initComponents() {
-        sizeField = new JTextField(10);
-        keyField = new JTextField(10);
-        nameField = new JTextField(10);
-        searchField = new JTextField(10);
-        deleteField = new JTextField(10);
+    private void initializeComponents() {
+        keyField = createStyledTextField();
+        nameField = createStyledTextField();
+        searchKeyField = createStyledTextField();
+        deleteKeyField = createStyledTextField();
 
-        outputArea = new JTextArea(15, 40);
-        outputArea.setEditable(false);
+        insertButton = createStyledButton("Insertar", new Color(34, 139, 34));
+        searchButton = createStyledButton("Buscar", new Color(255, 165, 0));
+        deleteButton = createStyledButton("Eliminar", new Color(220, 20, 60));
 
-        JButton createBtn = new JButton("Crear Tabla");
-        JButton insertBtn = new JButton("Insertar");
-        JButton searchBtn = new JButton("Buscar");
-        JButton deleteBtn = new JButton("Eliminar");
-        JButton showBtn = new JButton("Mostrar Tabla");
+        tableArea = new JTextArea(15, 40);
+        tableArea.setEditable(false);
+        tableArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        tableArea.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+    }
 
-        // Configurar acciones
-        createBtn.addActionListener(e -> createTable());
-        insertBtn.addActionListener(e -> insertRegister());
-        searchBtn.addActionListener(e -> searchRegister());
-        deleteBtn.addActionListener(e -> deleteRegister());
-        showBtn.addActionListener(e -> showTable());
+    private JTextField createStyledTextField() {
+        JTextField field = new JTextField(10);
+        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        return field;
+    }
 
-        // Agregar componentes al panel
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(new JLabel("Tamaño:"), gbc);
-        gbc.gridx = 1;
-        panel.add(sizeField, gbc);
-        gbc.gridx = 2;
-        panel.add(createBtn, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(new JLabel("Clave:"), gbc);
-        gbc.gridx = 1;
-        panel.add(keyField, gbc);
-        gbc.gridx = 2;
-        panel.add(insertBtn, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        panel.add(new JLabel("Nombre:"), gbc);
-        gbc.gridx = 1;
-        panel.add(nameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        panel.add(new JLabel("Buscar clave:"), gbc);
-        gbc.gridx = 1;
-        panel.add(searchField, gbc);
-        gbc.gridx = 2;
-        panel.add(searchBtn, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        panel.add(new JLabel("Eliminar clave:"), gbc);
-        gbc.gridx = 1;
-        panel.add(deleteField, gbc);
-        gbc.gridx = 2;
-        panel.add(deleteBtn, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 3;
-        panel.add(showBtn, gbc);
-
-        add(panel, BorderLayout.NORTH);
-        add(new JScrollPane(outputArea), BorderLayout.CENTER);
+    private JButton createStyledButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        return button;
     }
 
     private void setupLayout() {
-        setLayout(new BorderLayout());
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Panel superior
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new GridLayout(3, 1, 5, 5));
+
+        JPanel insertPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        insertPanel.setBorder(BorderFactory.createTitledBorder("Insertar"));
+        insertPanel.add(new JLabel("Clave:"));
+        insertPanel.add(keyField);
+        insertPanel.add(new JLabel("Nombre:"));
+        insertPanel.add(nameField);
+        insertPanel.add(insertButton);
+
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchPanel.setBorder(BorderFactory.createTitledBorder("Buscar"));
+        searchPanel.add(new JLabel("Clave:"));
+        searchPanel.add(searchKeyField);
+        searchPanel.add(searchButton);
+
+        JPanel deletePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        deletePanel.setBorder(BorderFactory.createTitledBorder("Eliminar"));
+        deletePanel.add(new JLabel("Clave:"));
+        deletePanel.add(deleteKeyField);
+        deletePanel.add(deleteButton);
+
+        topPanel.add(insertPanel);
+        topPanel.add(searchPanel);
+        topPanel.add(deletePanel);
+
+        JScrollPane scrollPane = new JScrollPane(tableArea);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Tabla Hash"));
+
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        add(mainPanel);
     }
 
-    private void createTable() {
-        try {
-            int size = Integer.parseInt(sizeField.getText());
-            if (size <= 0)
-                throw new NumberFormatException();
-            hashTable = new HashO(size);
-            outputArea.append("Tabla hash creada con tamaño " + size + "\n");
-        } catch (NumberFormatException e) {
-            outputArea.append("Error: Tamaño inválido. Debe ser un entero positivo.\n");
-        }
-    }
-
-    private void insertRegister() {
-        if (hashTable == null) {
-            outputArea.append("Error: Primero cree la tabla hash\n");
-            return;
-        }
-
-        try {
-            int key = Integer.parseInt(keyField.getText());
-            String name = nameField.getText().trim();
-
-            if (name.isEmpty()) {
-                outputArea.append("Error: El nombre no puede estar vacío\n");
-                return;
+    private void setupListeners() {
+        insertButton.addActionListener(e -> {
+            try {
+                int key = Integer.parseInt(keyField.getText().trim());
+                String name = nameField.getText().trim();
+                if (name.isEmpty()) {
+                    showMessage("El nombre no puede estar vacío.");
+                    return;
+                }
+                Register<String> reg = new Register<>(key, name);
+                hashTable.insert(reg);
+                keyField.setText("");
+                nameField.setText("");
+                refreshTable();
+            } catch (NumberFormatException ex) {
+                showMessage("Clave inválida.");
             }
+        });
 
-            Register reg = new Register(key, name);
-            hashTable.insert(reg);
-            outputArea.append("Insertado: " + reg + "\n");
+        searchButton.addActionListener(e -> {
+            try {
+                int key = Integer.parseInt(searchKeyField.getText().trim());
+                Register<String> reg = hashTable.search(key);
+                if (reg != null) {
+                    showMessage("Registro encontrado: " + reg);
+                } else {
+                    showMessage("No se encontró el registro.");
+                }
+                searchKeyField.setText("");
+            } catch (NumberFormatException ex) {
+                showMessage("Clave inválida.");
+            }
+        });
 
-            keyField.setText("");
-            nameField.setText("");
-        } catch (NumberFormatException e) {
-            outputArea.append("Error: Clave inválida. Debe ser un número entero.\n");
-        }
+        deleteButton.addActionListener(e -> {
+            try {
+                int key = Integer.parseInt(deleteKeyField.getText().trim());
+                hashTable.delete(key);
+                deleteKeyField.setText("");
+                refreshTable();
+            } catch (NumberFormatException ex) {
+                showMessage("Clave inválida.");
+            }
+        });
     }
 
-    private void searchRegister() {
-        if (hashTable == null) {
-            outputArea.append("Error: Primero cree la tabla hash\n");
-            return;
-        }
-
-        try {
-            int key = Integer.parseInt(searchField.getText());
-            Register reg = hashTable.search(key);
-
-            if (reg != null) {
-                outputArea.append("Encontrado: " + reg + "\n");
+    private void refreshTable() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < hashTable.getSize(); i++) {
+            sb.append("Pos ").append(i).append(": ");
+            if (hashTable.getBucket(i).isEmptyList()) {
+                sb.append("---");
             } else {
-                outputArea.append("Clave " + key + " no encontrada\n");
+                Node<Register<String>> node = hashTable.getBucket(i).getFirst();
+                while (node != null) {
+                    sb.append(node.getElemento()).append(" -> ");
+                    node = node.getNext();
+                }
+                sb.append("null");
             }
-
-            searchField.setText("");
-        } catch (NumberFormatException e) {
-            outputArea.append("Error: Clave inválida. Debe ser un número entero.\n");
+            sb.append("\n");
         }
+        tableArea.setText(sb.toString());
     }
 
-    private void deleteRegister() {
-        if (hashTable == null) {
-            outputArea.append("Error: Primero cree la tabla hash\n");
-            return;
-        }
-
-        try {
-            int key = Integer.parseInt(deleteField.getText());
-            hashTable.delete(key);
-            outputArea.append("Operación de eliminación para clave " + key + " completada\n");
-
-            deleteField.setText("");
-        } catch (NumberFormatException e) {
-            outputArea.append("Error: Clave inválida. Debe ser un número entero.\n");
-        }
-    }
-
-    private void showTable() {
-        if (hashTable == null) {
-            outputArea.append("Error: Primero cree la tabla hash\n");
-            return;
-        }
-
-        outputArea.append("Contenido de la tabla hash:\n");
-        // Simulamos el printTable() ya que no podemos acceder directamente a la tabla
-        hashTable.printTable();
-        outputArea.append("--- Fin de la tabla ---\n");
+    private void showMessage(String msg) {
+        JOptionPane.showMessageDialog(this, msg);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new HashOInterface());
+        SwingUtilities.invokeLater(() -> {
+            String input = JOptionPane.showInputDialog(null, "Tamaño de tabla hash:", "Inicializar", JOptionPane.QUESTION_MESSAGE);
+            try {
+                int size = Integer.parseInt(input);
+                if (size <= 0) throw new NumberFormatException();
+                new HashOInterface(size);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Ingrese un número válido mayor que 0.");
+            }
+        });
     }
 }
