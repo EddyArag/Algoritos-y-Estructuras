@@ -88,15 +88,4 @@ public class HashC<E extends Comparable<E>> {
             pos = (pos + 1) % size;
         } while (pos != 0 || table[pos].isAvailable == 0);
     }
-
-    //FALTA MODIFICAR PARA LA INTERFAZ
-    public List<Register<E>> getAll() {
-        List<Register<E>> list = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            if (table[i].isAvailable == 1) {
-                list.add(table[i].register);
-            }
-        }
-        return list;
-    }
 }
