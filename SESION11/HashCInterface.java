@@ -3,6 +3,9 @@ import javax.swing.*;
 import java.awt.*;
 import SESION11.LinkedList.*;
 
+/**
+ * Interfaz gráfica para la tabla hash cerrada con sondeo lineal.
+ */
 public class HashCInterface extends JFrame {
     private HashC<String> hashTable;
     private JTextField keyField, nameField;
@@ -21,13 +24,12 @@ public class HashCInterface extends JFrame {
         setSize(650, 550);
         setLocationRelativeTo(null);
         setVisible(true);
-        refreshTable(); // Mostrar tabla vacía al inicio
+        refreshTable();
     }
 
     private void initializeComponents() {
         keyField = createStyledTextField();
         nameField = createStyledTextField();
-
         searchKeyField = createStyledTextField();
         deleteKeyField = createStyledTextField();
 
@@ -115,6 +117,8 @@ public class HashCInterface extends JFrame {
                     refreshTable();
                 } catch (ExceptionIsFull ex) {
                     showMessage("La tabla hash está llena. No se puede insertar más elementos.");
+                } catch (Exception ex) {
+                    showMessage("Error al insertar: " + ex.getMessage());
                 }
             } catch (NumberFormatException ex) {
                 showMessage("Clave inválida. Debe ser un número entero.");
@@ -133,6 +137,8 @@ public class HashCInterface extends JFrame {
                 searchKeyField.setText("");
             } catch (NumberFormatException ex) {
                 showMessage("Clave inválida. Debe ser un número entero.");
+            } catch (Exception ex) {
+                showMessage("Error al buscar: " + ex.getMessage());
             }
         });
 
@@ -144,15 +150,20 @@ public class HashCInterface extends JFrame {
                 refreshTable();
             } catch (NumberFormatException ex) {
                 showMessage("Clave inválida. Debe ser un número entero.");
+            } catch (Exception ex) {
+                showMessage("Error al eliminar: " + ex.getMessage());
             }
         });
     }
 
     private void refreshTable() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < hashTable.getSize(); i++) {
-            sb.append("Pos ").append(i).append(": ");
+        sb.append("Posición\tRegistro\n");
+        sb.append("-----------------------------------\n");
+        int tableSize = hashTable.getTableSize();
+        for (int i = 0; i < tableSize; i++) {
             Register<String> reg = hashTable.getRegisterAt(i);
+            sb.append("Pos ").append(i).append(": ");
             if (reg != null) {
                 sb.append(reg.toString());
             } else {
@@ -180,3 +191,4 @@ public class HashCInterface extends JFrame {
         });
     }
 }
+
