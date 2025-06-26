@@ -79,13 +79,17 @@ public class BTree<E extends Comparable<E>> {
                 up = false;
                 return null;
             }
+            // Llamada recursiva: intenta insertar la clave en el subárbol correspondiente.
+            // Si hay desbordamiento en un hijo, la variable 'up' será true y 'mediana'
+            // tendrá la clave a subir.
             mediana = push(current.childs.get(pos[0]), cl);
             if (up) {
+                // Si el nodo actual está lleno, se debe dividir y subir la mediana.
                 if (current.nodeFull(this.orden - 1)) {
-                    // Si el nodo está lleno, dividir
+                    // Divide el nodo actual y sube la mediana.
                     mediana = divideNode(current, mediana, pos[0]);
                 } else {
-                    // Si hay espacio, insertar la clave
+                    // Si hay espacio, inserta la clave y el nuevo hijo en la posición adecuada.
                     up = false;
                     putNode(current, mediana, nDes, pos[0]);
                 }
@@ -138,12 +142,14 @@ public class BTree<E extends Comparable<E>> {
      */
     public void putNode(BNode<E> current, E cl, BNode<E> rd, int k) {
         int i;
-        // Desplaza claves y hijos a la derecha
+        // Desplaza claves y hijos a la derecha para hacer espacio en la posición k
         for (i = current.count - 1; i >= k; i--) {
             current.keys.set(i + 1, current.keys.get(i));
             current.childs.set(i + 2, current.childs.get(i + 1));
         }
+        // Inserta la nueva clave en la posición k
         current.keys.set(k, cl);
+        // Inserta el nuevo hijo derecho en la posición k+1
         current.childs.set(k + 1, rd);
         current.count++;
     }
@@ -233,7 +239,7 @@ public class BTree<E extends Comparable<E>> {
      */
     private E getPredecessor(BNode<E> node, int index) {
         BNode<E> current = node.childs.get(index);
-        // Se baja siempre por el hijo izquierdo hasta llegar a la hoja más a la derecha
+        // Baja por el hijo izquierdo hasta llegar a la hoja más a la derecha
         while (current.childs.get(current.count) != null) {
             // current.count es el índice del hijo más a la derecha
             current = current.childs.get(current.count);
