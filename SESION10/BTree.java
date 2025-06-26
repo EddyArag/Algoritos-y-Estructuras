@@ -197,6 +197,8 @@ public class BTree<E extends Comparable<E>> {
             } else {
                 boolean isDeleted = delete(node.childs.get(pos[0]), key);
                 // Si el hijo quedó con menos claves de las permitidas, arreglar
+                // (orden - 1) / 2 es el número mínimo de claves permitidas en un nodo (excepto
+                // raíz)
                 if (node.childs.get(pos[0]).count < (orden - 1) / 2) {
                     fix(node, pos[0]);
                 }
@@ -212,9 +214,12 @@ public class BTree<E extends Comparable<E>> {
      * @param index Índice de la clave.
      */
     private void removeKey(BNode<E> node, int index) {
+        // Desplaza todas las claves a la izquierda para cubrir el hueco dejado por la
+        // clave eliminada
         for (int i = index; i < node.count - 1; i++) {
             node.keys.set(i, node.keys.get(i + 1));
         }
+        // Elimina la última clave (ahora duplicada)
         node.keys.set(node.count - 1, null);
         node.count--;
     }
@@ -228,9 +233,12 @@ public class BTree<E extends Comparable<E>> {
      */
     private E getPredecessor(BNode<E> node, int index) {
         BNode<E> current = node.childs.get(index);
+        // Se baja siempre por el hijo izquierdo hasta llegar a la hoja más a la derecha
         while (current.childs.get(current.count) != null) {
+            // current.count es el índice del hijo más a la derecha
             current = current.childs.get(current.count);
         }
+        // El predecesor es la última clave de esa hoja
         return current.keys.get(current.count - 1);
     }
 
@@ -241,11 +249,14 @@ public class BTree<E extends Comparable<E>> {
      * @param index  Índice del hijo.
      */
     private void fix(BNode<E> parent, int index) {
+        // Si el hijo izquierdo tiene más claves que el mínimo, tomar prestado de él
         if (index > 0 && parent.childs.get(index - 1).count > (orden - 1) / 2) {
             borrowFromLeft(parent, index);
+            // Si el hijo derecho tiene al menos una clave, tomar prestado de él
         } else if (index < parent.count && parent.childs.get(index + 1).count > 0) {
             borrowFromRight(parent, index);
         } else {
+            // Si no se puede tomar prestado, fusionar con un hermano
             if (index > 0) {
                 merge(parent, index - 1);
             } else {
@@ -263,19 +274,28 @@ public class BTree<E extends Comparable<E>> {
     private void merge(BNode<E> parent, int index) {
         BNode<E> left = parent.childs.get(index);
         BNode<E> right = parent.childs.get(index + 1);
+        // Se coloca la clave del padre entre los dos hijos fusionados
         left.keys.set(left.count, parent.keys.get(index));
         left.count++;
+        // Copia todas las claves del hijo derecho al hijo izquierdo
         for (int i = 0; i < right.count; i++) {
+            // left.count + i: se colocan después de las claves actuales de left
             left.keys.set(left.count + i, right.keys.get(i));
         }
+        // Copia todos los hijos del hijo derecho al hijo izquierdo
         for (int i = 0; i <= right.count; i++) {
+            // left.count + i: hijos van después de los hijos actuales de left
             left.childs.set(left.count + i, right.childs.get(i));
         }
         left.count += right.count;
+        // Desplaza claves y punteros de hijos en el padre para cubrir el hueco
         for (int i = index; i < parent.count - 1; i++) {
+            // Se mueve cada clave una posición a la izquierda
             parent.keys.set(i, parent.keys.get(i + 1));
+            // Se mueve cada hijo una posición a la izquierda
             parent.childs.set(i + 1, parent.childs.get(i + 2));
         }
+        // Limpia la última clave y puntero de hijo en el padre
         parent.keys.set(parent.count - 1, null);
         parent.childs.set(parent.count, null);
     }
@@ -289,16 +309,24 @@ public class BTree<E extends Comparable<E>> {
     private void borrowFromLeft(BNode<E> parent, int index) {
         BNode<E> left = parent.childs.get(index - 1);
         BNode<E> current = parent.childs.get(index);
+        // Desplaza todas las claves de current una posición a la derecha para hacer
+        // espacio
         for (int i = current.count - 1; i >= 0; i--) {
             current.keys.set(i + 1, current.keys.get(i));
         }
+        // La clave del padre baja al hijo actual en la primera posición
         current.keys.set(0, parent.keys.get(index - 1));
+        // La última clave del hijo izquierdo sube al padre
         parent.keys.set(index - 1, left.keys.get(left.count - 1));
+        // Limpia la clave movida en el hijo izquierdo
         left.keys.set(left.count - 1, null);
+        // Si hay hijos (no es hoja), también se deben mover los punteros de hijos
         if (left.childs.get(left.count) != null) {
+            // Desplaza los hijos de current una posición a la derecha
             for (int i = current.count; i >= 0; i--) {
                 current.childs.set(i + 1, current.childs.get(i));
             }
+            // El último hijo del izquierdo pasa a ser el primer hijo del actual
             current.childs.set(0, left.childs.get(left.count));
             left.childs.set(left.count, null);
         }
@@ -315,15 +343,21 @@ public class BTree<E extends Comparable<E>> {
     private void borrowFromRight(BNode<E> parent, int index) {
         BNode<E> current = parent.childs.get(index);
         BNode<E> right = parent.childs.get(index + 1);
+        // La clave del padre baja al hijo actual en la última posición disponible
         current.keys.set(current.count, parent.keys.get(index));
+        // La primera clave del hijo derecho sube al padre
         parent.keys.set(index, right.keys.get(0));
+        // Si hay hijos (no es hoja), también se deben mover los punteros de hijos
         if (right.childs.get(right.count) != null) {
+            // El primer hijo del derecho pasa a ser el nuevo hijo del actual
             current.childs.set(current.count + 1, right.childs.get(0));
+            // Desplaza claves e hijos del derecho una posición a la izquierda
             for (int i = 0; i <= right.count; i++) {
                 right.keys.set(i, right.keys.get(i + 1));
                 right.childs.set(i, right.childs.get(i + 1));
             }
         }
+        // Limpia la última clave y puntero de hijo en el derecho
         right.keys.set(right.count, null);
         right.childs.set(right.count + 1, null);
         current.count++;
