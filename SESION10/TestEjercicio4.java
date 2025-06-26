@@ -1,7 +1,11 @@
 package SESION10;
 
+/**
+ * Prueba de inserción, búsqueda y eliminación de estudiantes en un árbol B.
+ */
 public class TestEjercicio4 {
     public static void main(String[] args) {
+        // Crear árbol B de orden 4 para estudiantes
         BTree<RegistroEstudiante> arbol = new BTree<>(4);
 
         // Insertar estudiantes
@@ -19,7 +23,7 @@ public class TestEjercicio4 {
         arbol.insert(new RegistroEstudiante(122, "Karina"));
         arbol.insert(new RegistroEstudiante(108, "Juan")); // Duplicado, no se insertará
 
-        // Buscar estudiantes
+        // Buscar estudiantes por código
         System.out.println("Buscar 115: " + buscarNombre(arbol, 115)); // David
         System.out.println("Buscar 132: " + buscarNombre(arbol, 132)); // Ernesto
         System.out.println("Buscar 999: " + buscarNombre(arbol, 999)); // No encontrado
@@ -39,13 +43,25 @@ public class TestEjercicio4 {
         System.out.println("Buscar 106: " + buscarNombre(arbol, 106));
     }
 
-    // Método para buscar el nombre del estudiante por código
+    /**
+     * Busca el nombre del estudiante por su código en el árbol B.
+     * 
+     * @param arbol  Árbol B de estudiantes.
+     * @param codigo Código a buscar.
+     * @return Nombre del estudiante o "No encontrado".
+     */
     public static String buscarNombre(BTree<RegistroEstudiante> arbol, int codigo) {
         RegistroEstudiante resultado = buscar(arbol.getRoot(), codigo);
         return resultado != null ? resultado.getNombre() : "No encontrado";
     }
 
-    // Búsqueda recursiva en el árbol B
+    /**
+     * Búsqueda recursiva de un estudiante por código en el árbol B.
+     * 
+     * @param nodo   Nodo actual.
+     * @param codigo Código a buscar.
+     * @return Registro del estudiante o null si no existe.
+     */
     private static RegistroEstudiante buscar(BNode<RegistroEstudiante> nodo, int codigo) {
         if (nodo == null)
             return null;

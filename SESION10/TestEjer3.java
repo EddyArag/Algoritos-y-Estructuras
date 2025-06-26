@@ -3,9 +3,13 @@ package SESION10;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Prueba para construir un árbol B desde archivo y mostrarlo visualmente.
+ */
 public class TestEjer3 {
     public static void main(String[] args) {
         try {
+            // Construir árbol B desde archivo
             BTree<Integer> arbol = BTree.building_Btree("arbolB.txt");
             System.out.println("Árbol B construido correctamente desde el archivo.");
             System.out.println("Representación del árbol:");
@@ -28,7 +32,12 @@ public class TestEjer3 {
         }
     }
 
-    // Método para imprimir el árbol B por niveles (texto)
+    /**
+     * Imprime el árbol B por niveles en texto.
+     * 
+     * @param nodo  Nodo actual.
+     * @param nivel Nivel del nodo.
+     */
     private static void imprimirArbol(BNode<Integer> nodo, int nivel) {
         if (nodo == null)
             return;
@@ -44,7 +53,9 @@ public class TestEjer3 {
         }
     }
 
-    // Panel para dibujar el árbol B
+    /**
+     * Panel para dibujar el árbol B visualmente usando Swing.
+     */
     static class BTreePanel extends JPanel {
         private final BTree<Integer> arbol;
         private final int NODE_HEIGHT = 40;
@@ -66,20 +77,27 @@ public class TestEjer3 {
             }
         }
 
-        // Calcula la altura del árbol
+        /**
+         * Calcula la altura del árbol.
+         */
         private int getTreeHeight(BNode<Integer> node) {
-            if (node == null) return 0;
+            if (node == null)
+                return 0;
             int max = 0;
             for (int i = 0; i <= node.count; i++) {
                 int h = getTreeHeight(node.childs.get(i));
-                if (h > max) max = h;
+                if (h > max)
+                    max = h;
             }
             return max + 1;
         }
 
-        // Dibuja el nodo y sus hijos correctamente distribuidos
+        /**
+         * Dibuja el nodo y sus hijos correctamente distribuidos.
+         */
         private void drawNode(Graphics g, BNode<Integer> node, int x, int y, int xSpan, int treeHeight) {
-            if (node == null) return;
+            if (node == null)
+                return;
 
             int totalWidth = node.count * KEY_WIDTH;
             int startX = x - totalWidth / 2;
@@ -97,29 +115,33 @@ public class TestEjer3 {
                 leaves[i] = countLeaves(node.childs.get(i));
                 totalLeaves += leaves[i];
             }
-            if (totalLeaves == 0) totalLeaves = node.count + 1; // Si es hoja
+            if (totalLeaves == 0)
+                totalLeaves = node.count + 1; // Si es hoja
 
             // Posición inicial para los hijos
             int childX = x - xSpan / 2;
             for (int i = 0; i <= node.count; i++) {
                 BNode<Integer> child = node.childs.get(i);
                 if (child != null) {
-                    int childSpan = (int)((xSpan * leaves[i]) / (double)totalLeaves);
+                    int childSpan = (int) ((xSpan * leaves[i]) / (double) totalLeaves);
                     int childCenter = childX + childSpan / 2;
                     g.drawLine(x, y + NODE_HEIGHT, childCenter, y + LEVEL_GAP);
                     drawNode(g, child, childCenter, y + LEVEL_GAP, childSpan, treeHeight - 1);
                     childX += childSpan;
                 } else {
                     // Avanzar aunque no haya hijo, para mantener el espacio
-                    int childSpan = (int)((xSpan * leaves[i]) / (double)totalLeaves);
+                    int childSpan = (int) ((xSpan * leaves[i]) / (double) totalLeaves);
                     childX += childSpan;
                 }
             }
         }
 
-        // Cuenta el número de hojas bajo un nodo (para espaciar bien)
+        /**
+         * Cuenta el número de hojas bajo un nodo (para espaciar bien).
+         */
         private int countLeaves(BNode<Integer> node) {
-            if (node == null) return 1;
+            if (node == null)
+                return 1;
             boolean isLeaf = true;
             for (int i = 0; i <= node.count; i++) {
                 if (node.childs.get(i) != null) {
@@ -127,7 +149,8 @@ public class TestEjer3 {
                     break;
                 }
             }
-            if (isLeaf) return 1;
+            if (isLeaf)
+                return 1;
             int sum = 0;
             for (int i = 0; i <= node.count; i++) {
                 sum += countLeaves(node.childs.get(i));

@@ -3,12 +3,25 @@ package SESION10;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Implementación genérica de un árbol B.
+ * 
+ * @param <E> Tipo de dato que almacena el árbol (debe ser comparable).
+ */
 public class BTree<E extends Comparable<E>> {
+    // Raíz del árbol
     private BNode<E> root;
+    // Orden del árbol (máximo de hijos por nodo)
     private int orden;
+    // Variables auxiliares para inserción
     private boolean up;
     private BNode<E> nDes;
 
+    /**
+     * Constructor del árbol B.
+     * 
+     * @param orden Orden del árbol (mínimo 3).
+     */
     public BTree(int orden) {
         this.orden = orden;
         this.root = null;
@@ -22,11 +35,17 @@ public class BTree<E extends Comparable<E>> {
         return this.root == null;
     }
 
+    /**
+     * Inserta una clave en el árbol B.
+     * 
+     * @param cl Clave a insertar.
+     */
     public void insert(E cl) {
         up = false;
         E mediana;
         BNode<E> pnew;
         mediana = push(this.root, cl);
+        // Si hubo desbordamiento en la raíz, crear nueva raíz
         if (up) {
             pnew = new BNode<E>(this.orden);
             pnew.count = 1;
@@ -37,10 +56,18 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
+    /**
+     * Inserta recursivamente una clave en el árbol.
+     * 
+     * @param current Nodo actual.
+     * @param cl      Clave a insertar.
+     * @return Clave mediana si hay desbordamiento.
+     */
     public E push(BNode<E> current, E cl) {
         int pos[] = new int[1];
         E mediana;
         if (current == null) {
+            // Caso base: insertar en hoja nueva
             up = true;
             nDes = null;
             return cl;
@@ -55,8 +82,10 @@ public class BTree<E extends Comparable<E>> {
             mediana = push(current.childs.get(pos[0]), cl);
             if (up) {
                 if (current.nodeFull(this.orden - 1)) {
+                    // Si el nodo está lleno, dividir
                     mediana = divideNode(current, mediana, pos[0]);
                 } else {
+                    // Si hay espacio, insertar la clave
                     up = false;
                     putNode(current, mediana, nDes, pos[0]);
                 }
@@ -65,30 +94,51 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
+    /**
+     * Divide un nodo cuando está lleno.
+     * 
+     * @param current Nodo a dividir.
+     * @param cl      Clave a insertar.
+     * @param k       Posición de inserción.
+     * @return Clave mediana que sube.
+     */
     public E divideNode(BNode<E> current, E cl, int k) {
         BNode<E> rd = nDes;
         int i, posMdna;
+        // Determina la posición de la mediana
         posMdna = (k <= this.orden / 2) ? this.orden / 2 : this.orden / 2 + 1;
         nDes = new BNode<E>(this.orden);
+        // Copia la mitad superior al nuevo nodo
         for (i = posMdna; i < this.orden - 1; i++) {
             nDes.keys.set(i - posMdna, current.keys.get(i));
             nDes.childs.set(i - posMdna + 1, current.childs.get(i + 1));
         }
         nDes.count = (this.orden - 1) - posMdna;
         current.count = posMdna;
+        // Inserta la nueva clave en el nodo correspondiente
         if (k <= this.orden / 2) {
             putNode(current, cl, rd, k);
         } else {
             putNode(nDes, cl, rd, k - posMdna);
         }
+        // Obtiene la mediana para subirla
         E median = current.keys.get(current.count - 1);
         nDes.childs.set(0, current.childs.get(current.count));
         current.count--;
         return median;
     }
 
+    /**
+     * Inserta una clave y un hijo en un nodo.
+     * 
+     * @param current Nodo donde insertar.
+     * @param cl      Clave a insertar.
+     * @param rd      Hijo derecho.
+     * @param k       Posición de inserción.
+     */
     public void putNode(BNode<E> current, E cl, BNode<E> rd, int k) {
         int i;
+        // Desplaza claves y hijos a la derecha
         for (i = current.count - 1; i >= k; i--) {
             current.keys.set(i + 1, current.keys.get(i));
             current.childs.set(i + 2, current.childs.get(i + 1));
@@ -98,11 +148,18 @@ public class BTree<E extends Comparable<E>> {
         current.count++;
     }
 
+    /**
+     * Elimina una clave del árbol B.
+     * 
+     * @param key Clave a eliminar.
+     * @throws ExceptionIsEmpty Si el árbol está vacío.
+     */
     public void delete(E key) throws ExceptionIsEmpty {
         if (root == null) {
             throw new ExceptionIsEmpty("El árbol está vacío.");
         }
         delete(root, key);
+        // Si la raíz queda vacía, ajusta la raíz
         if (root.count == 0) {
             if (root.childs.get(0) != null) {
                 root = null;
@@ -112,23 +169,34 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
+    /**
+     * Elimina recursivamente una clave.
+     * 
+     * @param node Nodo actual.
+     * @param key  Clave a eliminar.
+     * @return true si se eliminó, false si no existe.
+     */
     private boolean delete(BNode<E> node, E key) {
         int pos[] = new int[1];
         boolean found = node.searchNode(key, pos);
         if (found) {
             if (node.childs.get(pos[0]) == null) {
+                // Caso hoja: eliminar directamente
                 removeKey(node, pos[0]);
                 return true;
             } else {
+                // Caso interno: reemplazar por predecesor
                 E pred = getPredecessor(node, pos[0]);
                 node.keys.set(pos[0], pred);
                 return delete(node.childs.get(pos[0]), pred);
             }
         } else {
             if (node.childs.get(pos[0]) == null) {
+                // No existe la clave
                 return false;
             } else {
                 boolean isDeleted = delete(node.childs.get(pos[0]), key);
+                // Si el hijo quedó con menos claves de las permitidas, arreglar
                 if (node.childs.get(pos[0]).count < (orden - 1) / 2) {
                     fix(node, pos[0]);
                 }
@@ -137,6 +205,12 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
+    /**
+     * Elimina una clave de un nodo hoja.
+     * 
+     * @param node  Nodo hoja.
+     * @param index Índice de la clave.
+     */
     private void removeKey(BNode<E> node, int index) {
         for (int i = index; i < node.count - 1; i++) {
             node.keys.set(i, node.keys.get(i + 1));
@@ -145,6 +219,13 @@ public class BTree<E extends Comparable<E>> {
         node.count--;
     }
 
+    /**
+     * Obtiene el predecesor de una clave en un nodo.
+     * 
+     * @param node  Nodo.
+     * @param index Índice de la clave.
+     * @return Clave predecesora.
+     */
     private E getPredecessor(BNode<E> node, int index) {
         BNode<E> current = node.childs.get(index);
         while (current.childs.get(current.count) != null) {
@@ -153,6 +234,12 @@ public class BTree<E extends Comparable<E>> {
         return current.keys.get(current.count - 1);
     }
 
+    /**
+     * Corrige el subárbol si un hijo tiene menos claves de las permitidas.
+     * 
+     * @param parent Nodo padre.
+     * @param index  Índice del hijo.
+     */
     private void fix(BNode<E> parent, int index) {
         if (index > 0 && parent.childs.get(index - 1).count > (orden - 1) / 2) {
             borrowFromLeft(parent, index);
@@ -167,6 +254,12 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
+    /**
+     * Fusiona dos hijos del nodo padre.
+     * 
+     * @param parent Nodo padre.
+     * @param index  Índice del primer hijo.
+     */
     private void merge(BNode<E> parent, int index) {
         BNode<E> left = parent.childs.get(index);
         BNode<E> right = parent.childs.get(index + 1);
@@ -187,6 +280,12 @@ public class BTree<E extends Comparable<E>> {
         parent.childs.set(parent.count, null);
     }
 
+    /**
+     * Toma prestada una clave del hijo izquierdo.
+     * 
+     * @param parent Nodo padre.
+     * @param index  Índice del hijo.
+     */
     private void borrowFromLeft(BNode<E> parent, int index) {
         BNode<E> left = parent.childs.get(index - 1);
         BNode<E> current = parent.childs.get(index);
@@ -207,6 +306,12 @@ public class BTree<E extends Comparable<E>> {
         left.count--;
     }
 
+    /**
+     * Toma prestada una clave del hijo derecho.
+     * 
+     * @param parent Nodo padre.
+     * @param index  Índice del hijo.
+     */
     private void borrowFromRight(BNode<E> parent, int index) {
         BNode<E> current = parent.childs.get(index);
         BNode<E> right = parent.childs.get(index + 1);
@@ -225,7 +330,14 @@ public class BTree<E extends Comparable<E>> {
         right.count--;
     }
 
-    // Método de clase para construir un BTree desde archivo
+    /**
+     * Construye un árbol B a partir de un archivo de texto.
+     * 
+     * @param filename Nombre del archivo.
+     * @return Árbol B construido.
+     * @throws ItemNoFound Si hay error de formato o archivo.
+     * @throws IOException Si hay error de lectura.
+     */
     public static BTree<Integer> building_Btree(String filename) throws ItemNoFound, IOException {
         BufferedReader br = new BufferedReader(new FileReader(filename));
         String line = br.readLine();

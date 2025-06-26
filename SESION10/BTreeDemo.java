@@ -5,6 +5,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
+/**
+ * Interfaz gráfica para demostrar operaciones en un árbol B.
+ */
 public class BTreeDemo extends JFrame {
     private BTree<Integer> btree;
     private JTextField inputField;
@@ -40,25 +43,36 @@ public class BTreeDemo extends JFrame {
         add(panel, BorderLayout.NORTH);
         add(treePanel, BorderLayout.CENTER);
 
-        // Acciones
+        // Acciones de los botones
         insertButton.addActionListener(e -> insertarClave());
         deleteButton.addActionListener(e -> eliminarClave());
         showButton.addActionListener(e -> mostrarArbol());
     }
 
+    /**
+     * Solicita al usuario el orden del árbol B.
+     * 
+     * @return Orden ingresado (mínimo 3).
+     */
     private int solicitarOrden() {
         while (true) {
-            String input = JOptionPane.showInputDialog(null, "Ingrese el orden del árbol B (mínimo 3):", "Orden del Árbol", JOptionPane.QUESTION_MESSAGE);
+            String input = JOptionPane.showInputDialog(null, "Ingrese el orden del árbol B (mínimo 3):",
+                    "Orden del Árbol", JOptionPane.QUESTION_MESSAGE);
             try {
                 int orden = Integer.parseInt(input);
-                if (orden >= 3) return orden;
-                else JOptionPane.showMessageDialog(null, "El orden debe ser al menos 3.");
+                if (orden >= 3)
+                    return orden;
+                else
+                    JOptionPane.showMessageDialog(null, "El orden debe ser al menos 3.");
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Por favor ingrese un número válido.");
             }
         }
     }
 
+    /**
+     * Inserta una clave en el árbol B.
+     */
     private void insertarClave() {
         try {
             int clave = Integer.parseInt(inputField.getText());
@@ -70,6 +84,9 @@ public class BTreeDemo extends JFrame {
         }
     }
 
+    /**
+     * Elimina una clave del árbol B.
+     */
     private void eliminarClave() {
         try {
             int clave = Integer.parseInt(inputField.getText());
@@ -85,10 +102,16 @@ public class BTreeDemo extends JFrame {
         }
     }
 
+    /**
+     * Refresca la visualización del árbol.
+     */
     private void mostrarArbol() {
         treePanel.repaint();
     }
 
+    /**
+     * Panel para dibujar el árbol B visualmente.
+     */
     private class BTreePanel extends JPanel {
         private final int NODE_HEIGHT = 40;
         private final int KEY_WIDTH = 30;
@@ -104,8 +127,12 @@ public class BTreeDemo extends JFrame {
             }
         }
 
+        /**
+         * Dibuja recursivamente los nodos del árbol B.
+         */
         private void drawNode(Graphics g, BNode<Integer> node, int x, int y, int xOffset) {
-            if (node == null) return;
+            if (node == null)
+                return;
 
             int totalWidth = node.count * KEY_WIDTH;
             int startX = x - totalWidth / 2;
