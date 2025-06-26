@@ -1,4 +1,5 @@
 package SESION11;
+
 import javax.swing.*;
 import java.awt.*;
 import SESION11.LinkedList.*;
@@ -180,10 +181,12 @@ public class HashCInterface extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            String input = JOptionPane.showInputDialog(null, "Tamaño de tabla hash:", "Inicializar", JOptionPane.QUESTION_MESSAGE);
+            String input = JOptionPane.showInputDialog(null, "Tamaño de tabla hash:", "Inicializar",
+                    JOptionPane.QUESTION_MESSAGE);
             try {
                 int size = Integer.parseInt(input);
-                if (size <= 0) throw new NumberFormatException();
+                if (size <= 0)
+                    throw new NumberFormatException();
                 new HashCInterface(size);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Ingrese un número válido mayor que 0.");
@@ -191,4 +194,3 @@ public class HashCInterface extends JFrame {
         });
     }
 }
-
