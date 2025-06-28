@@ -46,7 +46,12 @@ public class HashC<E extends Comparable<E>> {
             if (table[pos].isAvailable == 1 && table[pos].register.getKey() == key) {
                 return pos;
             }
-        } while (pos != start || table[pos].isAvailable != 0);
+            if (table[pos].isAvailable == 0) {
+                // Si encontramos una celda vacía, la clave no está
+                return -1;
+            }
+            pos = (pos + 1) % size;
+        } while (pos != start);
         return -1;
     }
 
